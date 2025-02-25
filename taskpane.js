@@ -21,33 +21,26 @@ async function checkBoldWords() {
                 ? "Bold words found: " + boldWords.join(", ")
                 : "No bold words found.";
 
-            // Display the result in a dialog box
             Office.context.ui.displayDialogAsync(
-                "<div>" + message + "</div>", // Dialog HTML
-                { width: 300, height: 150 }, // Dialog options
+                "<div>" + message + "</div>",
+                { width: 300, height: 150 },
                 function (asyncResult) {
                     if (asyncResult.status === Office.AsyncResultStatus.Failed) {
                         console.error("Error displaying dialog: " + asyncResult.error.message);
                     }
                 }
             );
-
-
-
         });
     } catch (error) {
-        // Handle any errors during Word.run
         console.error("Error: " + error);
-
-        // Display error message to the user (e.g., in a dialog or alert)
-         Office.context.ui.displayDialogAsync(
-                "<div>An error occurred: " + error + "</div>", // Dialog HTML
-                { width: 300, height: 150 }, // Dialog options
-                function (asyncResult) {
-                    if (asyncResult.status === Office.AsyncResultStatus.Failed) {
-                        console.error("Error displaying dialog: " + asyncResult.error.message);
-                    }
+        Office.context.ui.displayDialogAsync(
+            "<div>An error occurred: " + error.message + "</div>", // Display the actual error message
+            { width: 300, height: 150 },
+            function (asyncResult) {
+                if (asyncResult.status === Office.AsyncResultStatus.Failed) {
+                    console.error("Error displaying dialog: " + asyncResult.error.message);
                 }
-            );
+            }
+        );
     }
 }
