@@ -6,12 +6,17 @@ async function checkBoldWords() {
     try {
         await Word.run(async (context) => {
             let paragraphs = context.document.body.paragraphs;
-            paragraphs.load(["items/font/bold", "items/text"]); 
+
+            // Load the necessary properties, including the nested 'font'
+            paragraphs.load(["items/font/bold", "items/font", "items/text"]); // Load font and text
+
+
             await context.sync();
 
             let boldWords = [];
             paragraphs.items.forEach(p => {
-                if (p && p.font && p.font.bold && p.text) { 
+                // Check if p, font, bold, and text exist (important for robustness)
+                if (p && p.font && p.font.bold && p.text) {
                     boldWords.push(p.text);
                 }
             });
