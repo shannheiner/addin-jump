@@ -1,7 +1,7 @@
 body {
     font-family: Arial, sans-serif;
     padding: 10px;
-    background-color: aqua; /* Or any other color you want */
+    background-color: aqua;
 }
 
 button {
@@ -10,4 +10,4 @@ button {
     cursor: pointer;
 }
 
-/* Any other styles you need here */
+/* Add any other styles you need here */

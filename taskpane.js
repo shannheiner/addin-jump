@@ -1,42 +1,37 @@
 Office.onReady(function (info) {
-    console.log("Office.js is ready.");
-
-    document.getElementById("checkBold").addEventListener("click", checkDocumentBody); // Attach to button click
+    document.getElementById("checkBold").addEventListener("click", checkBoldWords);
 });
 
-function checkDocumentBody() { // Function to be called on button click
-    Word.run(async (context) => {
-        try {
-            let body = context.document.body;
-
-            // Load properties - VERY IMPORTANT!
-            body.load("text"); // Load text
-            body.load("paragraphs"); // Load paragraphs (if you want to access them later)
-
+async function checkBoldWords() {
+    try {
+        await Word.run(async (context) => {
+            let paragraphs = context.document.body.paragraphs;
+            paragraphs.load(["items/font/bold", "items/text"]); 
             await context.sync();
 
-            console.log("Document Body:", body); // Check if you can get the body
-            console.log("Body Text:", body.text); // Check if you can get text
-            console.log("Number of Paragraphs:", body.paragraphs.items.length); // Check for paragraphs
+            let boldWords = [];
+            paragraphs.items.forEach(p => {
+                if (p && p.font && p.font.bold && p.text) { 
+                    boldWords.push(p.text);
+                }
+            });
 
-            // If you want to work with paragraphs, you need to load properties for them too:
-            if (body.paragraphs && body.paragraphs.items && body.paragraphs.items.length > 0) {
-              let firstParagraph = body.paragraphs.items[0];
-              firstParagraph.load(["font/bold", "text"]); // Load properties for paragraphs
+            let message = boldWords.length > 0
+                ? "Bold words found: " + boldWords.join(", ")
+                : "No bold words found.";
 
-              await context.sync();
-
-              console.log("First Paragraph Text:", firstParagraph.text);
-              console.log("First Paragraph Bold:", firstParagraph.font.bold);
-            }
-
-        } catch (error) {
-            console.error("Error in Word.run:", error);
-            Office.context.ui.displayDialogAsync("<div>Error: " + error.message + "</div>", { width: 300, height: 150 });
-        }
-    }).catch(function (error) {
-        console.error("Outer Error: " + error); // Catch any errors outside Word.run
-        Office.context.ui.displayDialogAsync("<div>Outer Error: " + error.message + "</div>", { width: 300, height: 150 });
-
-    });
+            Office.context.ui.displayDialogAsync(
+                "<div>" + message + "</div>",
+                { width: 300, height: 150 },
+                function (asyncResult) {
+                    if (asyncResult.status === Office.AsyncResultStatus.Failed) {
+                        console.error("Error displaying dialog: " + asyncResult.error.message);
+                    }
+                }
+            );
+        });
+    } catch (error) {
+        console.error("Error in Word.run:", error);
+        Office.context.ui.displayDialogAsync("<div>Error: " + error.message + "</div>", { width: 300, height: 150 });
+    }
 }
