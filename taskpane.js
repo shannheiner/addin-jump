@@ -5,44 +5,51 @@ Office.onReady(function (info) {
 async function checkBoldWords() {
     try {
         await Word.run(async (context) => {
-            // Get all the content controls in the document
+            // Get the document body
             const body = context.document.body;
             
-            // Instead of getTextRanges, we'll work with paragraphs and ranges
+            // Get all paragraphs in the document
             const paragraphs = body.paragraphs;
             paragraphs.load("text");
             
             await context.sync();
             
             let boldWords = [];
-            let boldRangesPromises = [];
             
-            // Process each paragraph to find bold text
+            // Process each paragraph
             for (let i = 0; i < paragraphs.items.length; i++) {
                 const paragraph = paragraphs.items[i];
-                const ranges = paragraph.getTextRanges([" ", "\t", "\r", "\n"], false);
-                ranges.load("text");
                 
-                await context.sync();
+                if (paragraph.text.trim() === "") continue;
                 
-                // For each word range, check if it's bold
-                for (let j = 0; j < ranges.items.length; j++) {
-                    const range = ranges.items[j];
-                    const font = range.font;
-                    font.load("bold");
+                // Create a range for the entire paragraph
+                const paragraphRange = paragraph.getRange();
+                
+                // Split the paragraph text into words
+                const words = paragraph.text.split(/\s+/);
+                let currentPosition = 0;
+                
+                // Check each word for bold formatting
+                for (let j = 0; j < words.length; j++) {
+                    const word = words[j];
+                    if (word === "") continue;
                     
-                    boldRangesPromises.push({ range, font });
-                }
-            }
-            
-            await context.sync();
-            
-            // Now check which ranges are bold
-            for (const item of boldRangesPromises) {
-                if (item.font.bold) {
-                    const text = item.range.text.trim();
-                    if (text && text.length > 0) {
-                        boldWords.push(text);
+                    // Find the position of the word
+                    const wordIndex = paragraph.text.indexOf(word, currentPosition);
+                    if (wordIndex !== -1) {
+                        // Create a range for just this word
+                        const wordRange = paragraph.getRange(wordIndex, word.length);
+                        const font = wordRange.font;
+                        font.load("bold");
+                        
+                        await context.sync();
+                        
+                        // Check if the word is bold
+                        if (font.bold) {
+                            boldWords.push(word);
+                        }
+                        
+                        currentPosition = wordIndex + word.length;
                     }
                 }
             }
@@ -55,7 +62,7 @@ async function checkBoldWords() {
                 ? "Bold words found: " + boldWords.join(", ")
                 : "No bold words found.";
             
-            // Display the message in the UI
+            // Display the message
             document.getElementById("result").innerHTML = message;
         });
     } catch (error) {
