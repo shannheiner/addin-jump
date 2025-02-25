@@ -6,13 +6,16 @@ async function checkBoldWords() {
     try {
         await Word.run(async (context) => {
             let paragraphs = context.document.body.paragraphs;
-            paragraphs.load("items/font/bold");
+
+            // *** Load the 'text' property along with 'font/bold' ***
+            paragraphs.load(["items/font/bold", "items/text"]); // Load both properties
 
             await context.sync();
 
             let boldWords = [];
             paragraphs.items.forEach(p => {
-                if (p.font.bold) {
+                // *** Check if p is defined before accessing properties ***
+                if (p && p.font && p.font.bold && p.text) { // Check for p and its properties
                     boldWords.push(p.text);
                 }
             });
@@ -34,7 +37,7 @@ async function checkBoldWords() {
     } catch (error) {
         console.error("Error: " + error);
         Office.context.ui.displayDialogAsync(
-            "<div>An error occurred: " + error.message + "</div>", // Display the actual error message
+            "<div>An error occurred: " + error.message + "</div>",
             { width: 300, height: 150 },
             function (asyncResult) {
                 if (asyncResult.status === Office.AsyncResultStatus.Failed) {
