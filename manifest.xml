@@ -2,8 +2,7 @@
 <OfficeApp xmlns="http://schemas.microsoft.com/office/appforoffice/1.1"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:type="TaskPaneApp">
-  <Id>0c9c86ab-8130-416d-8a57-b1812f3b6b7f</Id>
-  <Version>1.0</Version>
+  <Id>0c9c86ab-8130-416d-8a57-b1812f3b6b7f</Id>  <Version>1.0</Version>
   <ProviderName>Your Name</ProviderName>
   <DefaultLocale>en-US</DefaultLocale>
   <DisplayName>Word Add-in</DisplayName>
@@ -12,7 +11,6 @@
     <Host Name="Word"/>
   </Hosts>
   <DefaultSettings>
-    <SourceLocation DefaultValue="https://shannheiner.github.io/addin-jump/index.html"/>
-  </DefaultSettings>
+    <SourceLocation DefaultValue="https://shannheiner.github.io/addin-jump/index.html"/>  </DefaultSettings>
   <Permissions>ReadWriteDocument</Permissions>
 </OfficeApp>
