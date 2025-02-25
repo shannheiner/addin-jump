@@ -5,52 +5,58 @@ Office.onReady(function (info) {
 async function checkBoldWords() {
     try {
         await Word.run(async (context) => {
-            // Get the document body
+            // Get all the content controls in the document
             const body = context.document.body;
             
-            // Get all text ranges with bold formatting
-            const boldRanges = body.getTextRanges().getByFormat({ bold: true });
-            
-            // Load the text property for all bold ranges
-            boldRanges.load('text');
+            // Instead of getTextRanges, we'll work with paragraphs and ranges
+            const paragraphs = body.paragraphs;
+            paragraphs.load("text");
             
             await context.sync();
             
             let boldWords = [];
+            let boldRangesPromises = [];
             
-            // Check if boldRanges and items exist and are an array
-            if (boldRanges && boldRanges.items && Array.isArray(boldRanges.items)) {
-                boldRanges.items.forEach(range => {
-                    if (range && range.text) {
-                        // Split the text into words and add them to the boldWords array
-                        const words = range.text.trim().split(/\s+/);
-                        boldWords = boldWords.concat(words);
-                    }
-                });
+            // Process each paragraph to find bold text
+            for (let i = 0; i < paragraphs.items.length; i++) {
+                const paragraph = paragraphs.items[i];
+                const ranges = paragraph.getTextRanges([" ", "\t", "\r", "\n"], false);
+                ranges.load("text");
                 
-                // Remove duplicates and empty strings
-                boldWords = [...new Set(boldWords)].filter(word => word.length > 0);
+                await context.sync();
+                
+                // For each word range, check if it's bold
+                for (let j = 0; j < ranges.items.length; j++) {
+                    const range = ranges.items[j];
+                    const font = range.font;
+                    font.load("bold");
+                    
+                    boldRangesPromises.push({ range, font });
+                }
             }
+            
+            await context.sync();
+            
+            // Now check which ranges are bold
+            for (const item of boldRangesPromises) {
+                if (item.font.bold) {
+                    const text = item.range.text.trim();
+                    if (text && text.length > 0) {
+                        boldWords.push(text);
+                    }
+                }
+            }
+            
+            // Remove duplicates
+            boldWords = [...new Set(boldWords)];
             
             // Create a message with the bold words or a default message
             let message = boldWords.length > 0
                 ? "Bold words found: " + boldWords.join(", ")
                 : "No bold words found.";
             
-            // Display the message in a dialog
-            // Note: For Word Online, you should use a better approach than displayDialogAsync for simple messages
+            // Display the message in the UI
             document.getElementById("result").innerHTML = message;
-            
-            // Alternatively, you could use the Office UI:
-            // Office.context.ui.displayDialogAsync(
-            //     "https://shannheiner.github.io/addin-jump/dialog.html",
-            //     { width: 30, height: 30 },
-            //     function (asyncResult) {
-            //         if (asyncResult.status === Office.AsyncResultStatus.Failed) {
-            //             console.error("Error displaying dialog: " + asyncResult.error.message);
-            //         }
-            //     }
-            // );
         });
     } catch (error) {
         console.error("Error in Word.run:", error);
