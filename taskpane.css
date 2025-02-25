@@ -1,6 +1,7 @@
 body {
     font-family: Arial, sans-serif;
     padding: 10px;
+    background-color: aqua; /* Or any other color you want */
 }
 
 button {
@@ -8,3 +9,5 @@ button {
     margin-top: 10px;
     cursor: pointer;
 }
+
+/* Any other styles you need here */
