@@ -18,51 +18,60 @@ async function checkBoldWords() {
         isProcessing = true;
         
         // Clear previous results
-        document.getElementById("result").innerHTML = "Checking for bold words...";
+        document.getElementById("result").innerHTML = "Checking for specific bold words...";
+        
+        // Specific words to check
+        const wordsToCheck = ["run", "jump", "fly", "kite"];
         
         // Create a completely new context for each run
         await Word.run(async (context) => {
-            // Get the document body
-            const body = context.document.body;
-            body.load("text");
-            await context.sync();
+            const boldWords = [];
+            const notBoldWords = [];
             
-            // Get all content as text first
-            const fullText = body.text;
-            
-            // Simple word extraction - split by spaces and punctuation
-            const allWords = fullText.split(/[\s,.;:!?()[\]{}'""\-–—]+/)
-                .filter(word => word.length > 0);
-            
-            // Remove duplicates
-            const uniqueWords = [...new Set(allWords)];
-            
-            let boldWords = [];
-            
-            // Check each unique word
-            for (const word of uniqueWords) {
-                // Skip very short words or non-word characters
-                if (word.length < 2 || !word.match(/[a-zA-Z0-9]/)) continue;
-                
+            // Check each specific word
+            for (const word of wordsToCheck) {
                 // Create a new search for this word
                 const search = context.document.body.search(word, {matchWholeWord: true});
                 search.load("font/bold");
                 
                 await context.sync();
                 
-                // Check if any instance of this word is bold
-                for (let i = 0; i < search.items.length; i++) {
-                    if (search.items[i].font.bold) {
-                        boldWords.push(word);
-                        break;  // One bold instance is enough
+                // Check if the word exists in the document
+                if (search.items.length > 0) {
+                    // Check if any instance of this word is bold
+                    let isBold = false;
+                    for (let i = 0; i < search.items.length; i++) {
+                        if (search.items[i].font.bold) {
+                            isBold = true;
+                            break;  // One bold instance is enough
+                        }
                     }
+                    
+                    if (isBold) {
+                        boldWords.push(word);
+                    } else {
+                        notBoldWords.push(word);
+                    }
+                } else {
+                    // Word not found in document
+                    notBoldWords.push(word + " (not found)");
                 }
             }
             
             // Create a message with the results
-            let message = boldWords.length > 0
-                ? "Bold words found: " + boldWords.join(", ")
-                : "No bold words found.";
+            let message = "<strong>Results:</strong><br>";
+            
+            if (boldWords.length > 0) {
+                message += "<br><strong>Bold words:</strong> " + boldWords.join(", ");
+            } else {
+                message += "<br><strong>Bold words:</strong> None";
+            }
+            
+            if (notBoldWords.length > 0) {
+                message += "<br><strong>Not bold words:</strong> " + notBoldWords.join(", ");
+            } else {
+                message += "<br><strong>Not bold words:</strong> None";
+            }
             
             // Display the message
             document.getElementById("result").innerHTML = message;
