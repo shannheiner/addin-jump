@@ -2,117 +2,83 @@
 let isProcessing = false;
 
 Office.onReady(function (info) {
-    document.getElementById("checkBold").addEventListener("click", function() {
-        // Only proceed if we're not already processing
+    document.getElementById("checkFormatting").addEventListener("click", function() {
         if (!isProcessing) {
-            checkBoldWords();
+            checkFormatting();
         } else {
             document.getElementById("result").innerHTML = "Please wait, still processing...";
         }
     });
 });
- 
-async function checkBoldWords() {
+
+async function checkFormatting() {
     try {
-        // Set processing flag
         isProcessing = true;
-        
-        // Clear previous results and show processing message
-        document.getElementById("result").innerHTML = "Checking for specific bold words...";
-        
-        // Specific words to check
-        const wordsToCheck = ["run", "jump", "fly", "kite"];
-        
-        // Create a completely new context for each run
+        document.getElementById("result").innerHTML = "Checking formatting...";
+
+        const formatChecks = [
+            { text: "Bold 1", property: "bold", expected: true },
+            { text: "Bold 2", property: "bold", expected: true },
+            { text: "Italic 1", property: "italic", expected: true },
+            { text: "Italic 2", property: "italic", expected: true },
+            { text: "Underline 1", property: "underline", expected: true },
+            { text: "Underline 2", property: "underline", expected: true },
+            { text: "Subscript 1", property: "subscript", expected: true },
+            { text: "Subscript 2", property: "subscript", expected: true },
+            { text: "Superscript 1", property: "superscript", expected: true },
+            { text: "Superscript 2", property: "superscript", expected: true },
+            { text: "Strikethrough 1", property: "strikethrough", expected: true },
+            { text: "Strikethrough 2", property: "strikethrough", expected: true },
+            { text: "Font Type: Calibri", property: "name", expected: "Calibri" },
+            { text: "Font Type: Times New Roman", property: "name", expected: "Times New Roman" },
+            { text: "Font Type: Comic Sans MS", property: "name", expected: "Comic Sans MS" },
+            { text: "Font Type: Consolas", property: "name", expected: "Consolas" },
+            { text: "Font Type: Verdana Pro", property: "name", expected: "Verdana Pro" },
+            { text: "Font Type: Cooper Black", property: "name", expected: "Cooper Black" },
+            { text: "Font Color: Red", property: "color", expected: "#FF0000" },
+            { text: "Font Color: Dark Green", property: "color", expected: "#006400" },
+            { text: "Font Color: Purple", property: "color", expected: "#800080" },
+            { text: "Font Color: Light Blue", property: "color", expected: "#ADD8E6" },
+            { text: "Font Color: Orange", property: "color", expected: "#FFA500" },
+            { text: "Highlight: Cyan", property: "highlightColor", expected: "cyan" },
+            { text: "Highlight: Light Grey", property: "highlightColor", expected: "lightgrey" },
+            { text: "Highlight: Magenta", property: "highlightColor", expected: "magenta" },
+            { text: "Highlight: Yellow", property: "highlightColor", expected: "yellow" },
+            { text: "Font Size: 10", property: "size", expected: 10 },
+            { text: "Font Size: 12", property: "size", expected: 12 },
+            { text: "Font Size: 13", property: "size", expected: 13 },
+            { text: "Font Size: 14", property: "size", expected: 14 },
+            { text: "Font Size: 16", property: "size", expected: 16 },
+            { text: "Font Size: 19", property: "size", expected: 19 },
+            { text: "Font Size: 24", property: "size", expected: 24 },
+            { text: "Font Size: 25", property: "size", expected: 25 },
+            { text: "Font Size: 72", property: "size", expected: 72 }
+        ];
+
         await Word.run(async (context) => {
-            const boldWords = [];
-            const notBoldWords = [];
-            
-            // Check each specific word
-            for (const word of wordsToCheck) {
-                // Create a new search for this word
-                const search = context.document.body.search(word, {matchWholeWord: true});
-                search.load("font/bold");
-                
+            let results = [];
+            for (const check of formatChecks) {
+                const search = context.document.body.search(check.text, { matchWholeWord: true });
+                search.load("items/font");
                 await context.sync();
                 
-                // Check if the word exists in the document
-                if (search.items && search.items.length > 0) {
-                    // Check if any instance of this word is bold
-                    let isBold = false;
+                let isCorrect = false;
+                if (search.items.length > 0) {
                     for (let i = 0; i < search.items.length; i++) {
-                        if (search.items[i].font.bold) {
-                            isBold = true;
-                            break;  // One bold instance is enough
+                        if (search.items[i].font[check.property] === check.expected) {
+                            isCorrect = true;
+                            break;
                         }
                     }
-                    
-                    if (isBold) {
-                        boldWords.push(word);
-                    } else {
-                        notBoldWords.push(word);
-                    }
-                } else {
-                    // Word not found in document
-                    notBoldWords.push(word + " (not found)");
                 }
+                results.push(`<div style='font-size: 12px;'>${check.text}: <span style='color: ${isCorrect ? "green" : "red"};'>${isCorrect ? "Correct" : "Incorrect"}</span></div>`);
             }
-            
-            // Create the results as formatted HTML for display in the taskpane
-            let resultsHtml = `
-                <div style="background-color: white; border-radius: 8px; padding: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                    <h3 style="color: #4472C4; margin-top: 0;">Bold Check Results</h3>
-                    
-                    <div style="margin-bottom: 15px;">
-                        <div style="font-weight: bold; margin-bottom: 5px;">Bold words:</div>
-                        <div style="background-color: #f2f2f2; padding: 10px; border-radius: 4px;">
-                            ${boldWords.length > 0 ? boldWords.join(", ") : "None"}
-                        </div>
-                    </div>
-                    
-                    <div style="margin-bottom: 15px;">
-                        <div style="font-weight: bold; margin-bottom: 5px;">Not bold words:</div>
-                        <div style="background-color: #f2f2f2; padding: 10px; border-radius: 4px;">
-                            ${notBoldWords.length > 0 ? notBoldWords.join(", ") : "None"}
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            // Display the results in the taskpane
-            document.getElementById("result").innerHTML = resultsHtml;
-            
-            // Show a popup notification (which is more reliable than displayDialogAsync in Word Online)
-            if (Office.context.mailbox) {
-                // For Outlook
-                Office.context.mailbox.item.notificationMessages.addAsync("boldCheckResults", {
-                    type: "informationalMessage",
-                    message: "Bold check complete! See results in the add-in pane.",
-                    icon: "icon16",
-                    persistent: false
-                });
-            } else {
-                // For Word, try to use showNotification if available
-                try {
-                    // For Word, show a simplified alert instead of a full dialog
-                    // This creates a more reliable, temporary notification
-                    const boldCount = boldWords.length;
-                    const notBoldCount = notBoldWords.length;
-                    
-                    const summaryMessage = `Bold check complete: ${boldCount} bold word(s), ${notBoldCount} not bold word(s). See details in the add-in panel.`;
-                    
-                    // Use built-in alert - this is more reliable than displayDialogAsync
-                    alert(summaryMessage);
-                } catch (notificationError) {
-                    console.log("Notification not available, continuing silently", notificationError);
-                }
-            }
+            document.getElementById("result").innerHTML = `<div style='font-size: 12px; max-height: 400px; overflow-y: auto;'>${results.join(" ")}</div>`;
         });
     } catch (error) {
         console.error("Error in Word.run:", error);
         document.getElementById("result").innerHTML = "Error: " + error.message;
     } finally {
-        // Always reset the processing flag, even if there was an error
         isProcessing = false;
     }
 }
