@@ -2,16 +2,16 @@
 let isProcessing = false;
 
 Office.onReady(function (info) {
-    document.getElementById("checkFormatting").addEventListener("click", function() {
+    document.getElementById("checkBold").addEventListener("click", function() {
         if (!isProcessing) {
-            checkFormatting();
+            checkBoldWords();
         } else {
             document.getElementById("result").innerHTML = "Please wait, still processing...";
         }
     });
 });
 
-async function checkFormatting() {
+async function checkBoldWords() {
     try {
         isProcessing = true;
         document.getElementById("result").innerHTML = "Checking formatting...";
