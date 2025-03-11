@@ -74,15 +74,19 @@ async function checkBoldWords() {
                 search.load("items/font");
                 await context.sync();
 
-                let isCorrect = false;
+                let isCorrect = true; // Start by assuming all are correct
+
                 if (search.items.length > 0) {
                     for (let i = 0; i < search.items.length; i++) {
-                        if (check.property === "none" || search.items[i].font[check.property] === check.expected) { // Added condition for "Round 2"
-                            isCorrect = true;
-                            break;
+                        if (check.property !== "none" && search.items[i].font[check.property] !== check.expected) {
+                            isCorrect = false; // Set to false if any instance is incorrect
+                            break; // No need to check further if one is incorrect
                         }
                     }
+                } else {
+                    isCorrect = false; // if no search results are found, it is incorrect.
                 }
+
                 results.push(`<div style='font-size: 12px;'>${check.text}: <span style='color: ${isCorrect ? "green" : "red"};'>${isCorrect ? "Correct" : "Incorrect"}</span></div>`);
             }
             document.getElementById("result").innerHTML = `<div style='font-size: 12px; max-height: 400px; overflow-y: auto;'>${results.join(" ")}</div>`;
