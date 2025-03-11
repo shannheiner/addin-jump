@@ -48,7 +48,7 @@ async function checkBoldWords() {
             { text: "Font Size: 16", property: "size", expected: 16 },
             { text: "Font Size: 19", property: "size", expected: 19 },
             { text: "Font Size: 24", property: "size", expected: 24 },
-            { text: "Round 2", property: "none", expected: "none" }, // Dummy check for "Round 2"
+            { text: "Round 2", property: "none", expected: "none" },
             { text: "Bold 2", property: "bold", expected: true },
             { text: "Italic 2", property: "italic", expected: true },
             { text: "Underline 2", property: "underline", expected: true },
@@ -74,19 +74,15 @@ async function checkBoldWords() {
                 search.load("items/font");
                 await context.sync();
 
-                let isCorrect = true; // Start by assuming all are correct
-
+                let isCorrect = false;
                 if (search.items.length > 0) {
                     for (let i = 0; i < search.items.length; i++) {
-                        if (check.property !== "none" && search.items[i].font[check.property] !== check.expected) {
-                            isCorrect = false; // Set to false if any instance is incorrect
-                            break; // No need to check further if one is incorrect
+                        if (check.property === "none" || search.items[i].font[check.property] === check.expected) {
+                            isCorrect = true;
+                            break; // Break on the FIRST match
                         }
                     }
-                } else {
-                    isCorrect = false; // if no search results are found, it is incorrect.
                 }
-
                 results.push(`<div style='font-size: 12px;'>${check.text}: <span style='color: ${isCorrect ? "green" : "red"};'>${isCorrect ? "Correct" : "Incorrect"}</span></div>`);
             }
             document.getElementById("result").innerHTML = `<div style='font-size: 12px; max-height: 400px; overflow-y: auto;'>${results.join(" ")}</div>`;
