@@ -1,15 +1,135 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Format Checker</title>
-    <script src="https://appsforoffice.microsoft.com/lib/1/hosted/Office.js" type="text/javascript"></script>
-    <link rel="stylesheet" href="taskpane.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Add-in with Firebase</title>
+    <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+
+    <!-- Firebase SDK (CDN) -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        input, button { display: block; margin: 10px 0; padding: 10px; width: 100%; }
+        #logout-btn { background-color: red; color: white; }
+    </style>
 </head>
 <body>
-    <h1>Format Checker</h1>
-    <button id="checkFormat">Check Formatting</button>
+
+    <h2>Word Add-in with Firebase</h2>
+
+    <!-- Login Form -->
+    <div id="login-container">
+        <input type="email" id="email" placeholder="Enter Email">
+        <input type="password" id="password" placeholder="Enter Password">
+        <button id="login-btn">Login</button>
+        <button id="signup-btn">Sign Up</button>
+    </div>
+
+    <!-- Logout Button (Hidden Initially) -->
+    <button id="logout-btn" style="display: none;">Logout</button>
+
+    <!-- Result Display -->
+    <div id="user-info"></div>
+    <button id="checkBold">Check Bold Text</button>
     <div id="result"></div>
-    <script src="taskpane.js"></script>
+
+    <script>
+        // Firebase Configuration (Replace with your Firebase details)
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        // Login User
+        document.getElementById("login-btn").addEventListener("click", function() {
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+            
+            auth.signInWithEmailAndPassword(email, password)
+                .then(userCredential => {
+                    document.getElementById("user-info").innerHTML = `Logged in as: ${userCredential.user.email}`;
+                    document.getElementById("login-container").style.display = "none";
+                    document.getElementById("logout-btn").style.display = "block";
+                })
+                .catch(error => alert(error.message));
+        });
+
+        // Sign Up User
+        document.getElementById("signup-btn").addEventListener("click", function() {
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+
+            auth.createUserWithEmailAndPassword(email, password)
+                .then(userCredential => {
+                    alert("Account created successfully! Please log in.");
+                })
+                .catch(error => alert(error.message));
+        });
+
+        // Logout User
+        document.getElementById("logout-btn").addEventListener("click", function() {
+            auth.signOut().then(() => {
+                document.getElementById("user-info").innerHTML = "";
+                document.getElementById("login-container").style.display = "block";
+                document.getElementById("logout-btn").style.display = "none";
+            });
+        });
+
+        // Check User Authentication State
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                document.getElementById("user-info").innerHTML = `Logged in as: ${user.email}`;
+                document.getElementById("login-container").style.display = "none";
+                document.getElementById("logout-btn").style.display = "block";
+            } else {
+                document.getElementById("user-info").innerHTML = "";
+                document.getElementById("login-container").style.display = "block";
+                document.getElementById("logout-btn").style.display = "none";
+            }
+        });
+
+        // Word Add-in: Check Bold Text
+        Office.onReady(function () {
+            document.getElementById("checkBold").addEventListener("click", function() {
+                checkBoldWords();
+            });
+        });
+
+        async function checkBoldWords() {
+            try {
+                document.getElementById("result").innerHTML = "Checking formatting...";
+
+                await Word.run(async (context) => {
+                    const searchResults = context.document.body.search("Bold", { matchWholeWord: true });
+                    searchResults.load("items/font");
+                    await context.sync();
+
+                    let isBold = false;
+                    if (searchResults.items.length > 0) {
+                        isBold = searchResults.items[0].font.bold;
+                    }
+
+                    document.getElementById("result").innerHTML = isBold ? 
+                        "<span style='color:green;'>Bold text is correct!</span>" : 
+                        "<span style='color:red;'>Bold text is incorrect.</span>";
+                });
+            } catch (error) {
+                console.error("Error:", error);
+                document.getElementById("result").innerHTML = "Error: " + error.message;
+            }
+        }
+    </script>
 </body>
 </html>
