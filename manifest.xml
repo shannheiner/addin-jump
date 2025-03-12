@@ -1,79 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<OfficeApp
-          xmlns="http://schemas.microsoft.com/office/appforoffice/1.1"
-          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0"
-          xmlns:ov="http://schemas.microsoft.com/office/taskpaneappversionoverrides"
-          xsi:type="TaskPaneApp">
-
-  <!-- Basic Settings -->
-  <Id>3c56a7f7-e6a9-4f86-b1f7-8c4f17c8a000</Id>
-  <Version>1.0.0.0</Version>
-  <ProviderName>YourName</ProviderName>
+<OfficeApp xmlns="http://schemas.microsoft.com/office/appforoffice/1.1"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:type="TaskPaneApp">
+  <Id>0c9c86ab-8130-416d-8a57-b1812f3b6b7f</Id>  <Version>1.0</Version>
+  <ProviderName>Your Name</ProviderName>
   <DefaultLocale>en-US</DefaultLocale>
-  <DisplayName DefaultValue="Format Checker Add-in" />
-  <Description DefaultValue="Checks if specific text has correct formatting" />
-
-  <!-- Host Info -->
+  <DisplayName>Word Add-in</DisplayName>
+  <Description>Checks for bold words in a Word document.</Description>
   <Hosts>
-    <Host Name="Document" />
+    <Host Name="Word"/>
   </Hosts>
-
-  <!-- Permission requests -->
-  <Permissions>ReadWriteDocument</Permissions>
-
-  <!-- Default settings -->
   <DefaultSettings>
-    <SourceLocation DefaultValue="https://localhost:3000/taskpane.html" />
-  </DefaultSettings>
-
-  <!-- Version Overrides for Office 2016 and higher -->
-  <VersionOverrides xmlns="http://schemas.microsoft.com/office/taskpaneappversionoverrides" xsi:type="VersionOverridesV1_0">
-    <Hosts>
-      <Host xsi:type="Document">
-        <DesktopFormFactor>
-          <GetStarted>
-            <Title>Format Checker Add-in</Title>
-            <Description>Check document formatting of specific text.</Description>
-          </GetStarted>
-          <FunctionFile resid="Contoso.DesktopFunctionFile.Url" />
-
-          <!-- Task Pane integration -->
-          <ExtensionPoint xsi:type="PrimaryCommandSurface">
-            <OfficeTab id="TabHome">
-              <Group id="Contoso.Group1">
-                <Label resid="Contoso.Group1Label" />
-                <Control xsi:type="Button" id="Contoso.TaskpaneButton">
-                  <Label resid="Contoso.TaskpaneButton.Label" />
-                  <Supertip>
-                    <Title resid="Contoso.TaskpaneButton.Label" />
-                    <Description resid="Contoso.TaskpaneButton.Tooltip" />
-                  </Supertip>
-                  <Action xsi:type="ShowTaskpane">
-                    <TaskpaneId>ButtonId1</TaskpaneId>
-                    <SourceLocation resid="Contoso.Taskpane.Url" />
-                  </Action>
-                </Control>
-              </Group>
-            </OfficeTab>
-          </ExtensionPoint>
-        </DesktopFormFactor>
-      </Host>
-    </Hosts>
-
-    <!-- Resource references -->
-    <Resources>
-      <bt:Urls>
-        <bt:Url id="Contoso.Taskpane.Url" DefaultValue="https://localhost:3000/taskpane.html" />
-        <bt:Url id="Contoso.DesktopFunctionFile.Url" DefaultValue="https://localhost:3000/function-file.html" />
-      </bt:Urls>
-      <bt:ShortStrings>
-        <bt:String id="Contoso.TaskpaneButton.Label" DefaultValue="Format Checker" />
-        <bt:String id="Contoso.Group1Label" DefaultValue="Format Checker" />
-      </bt:ShortStrings>
-      <bt:LongStrings>
-        <bt:String id="Contoso.TaskpaneButton.Tooltip" DefaultValue="Check if specific text has correct formatting" />
-      </bt:LongStrings>
-    </Resources>
-  </VersionOverrides>
+    <SourceLocation DefaultValue="https://shannheiner.github.io/addin-jump/index.html"/>  </DefaultSettings>
+  <Permissions>ReadWriteDocument</Permissions>
 </OfficeApp>
