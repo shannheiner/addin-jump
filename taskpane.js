@@ -11,8 +11,8 @@ async function checkFormatting() {
             let formatChecks = [
                 { text: "Bold 1", property: "bold", expected: true },
                 { text: "Bold 2", property: "bold", expected: true },
-                { text: "Highlighted Green", property: "highlightColor", expected: "green" },
-                { text: "Underline1", property: "underline", expected: true }
+                { text: "Highlighted Green", property: "highlightColor", expected: "#00FF00" },
+                { text: "Underline1", property: "underline", expected: "exists" } // Changed expected value
             ];
 
             let results = [];
@@ -30,7 +30,17 @@ async function checkFormatting() {
                         console.log("Highlight Color:", search.items[i].font.highlightColor); // Inspect highlight color
                         console.log("Underline:", search.items[i].font.underline); // Inspect underline
 
-                        if (search.items[i].font[check.property] === check.expected) {
+                        if (check.property === "highlightColor"){
+                            if(search.items[i].font[check.property] === check.expected){
+                                isCorrect = true;
+                                break;
+                            }
+                        } else if (check.property === "underline"){
+                            if(search.items[i].font[check.property] !== "None"){
+                                isCorrect = true;
+                                break;
+                            }
+                        } else if (search.items[i].font[check.property] === check.expected) {
                             isCorrect = true;
                             break;
                         }
