@@ -22,9 +22,9 @@ async function checkFormatting() {
                 { text: "Font Color: Red", property: "color", expected: ["#FF0000", "red"] },
                 { text: "Font Color: Dark Green", property: "color", expected: ["#008000", "darkgreen"] },
                 { text: "Font Color: Purple", property: "color", expected: ["#800080", "purple"] },
-                { text: "Highlighted Green", property: "highlightColor", expected: "#00FF00" },
-                { text: "Highlight Cyan", property: "highlightColor", expected: "cyan" },
-                { text: "Highlight Light Gray", property: "highlightColor", expected: "lightgrey" },
+                { text: "Highlighted Green", property: "highlightColor", expected: ["#00FF00", "green"] },
+                { text: "Highlight Cyan", property: "highlightColor", expected: ["cyan", "#00FFFF"] },
+                { text: "Highlight Light Gray", property: "highlightColor", expected: ["lightgrey", "#D3D3D3"] },
                 { text: "Font Size: 14", property: "size", expected: 14 },
                 { text: "Font Size: 16", property: "size", expected: 16 },
                 { text: "Font Size: 19", property: "size", expected: 19 },
@@ -40,17 +40,14 @@ async function checkFormatting() {
                 let isCorrect = false;
                 if (search.items.length > 0) {
                     for (let i = 0; i < search.items.length; i++) {
-                        if (check.property === "highlightColor" && search.items[i].font[check.property] === check.expected) {
-                            isCorrect = true;
-                            break;
-                        } else if (check.property === "underline" && search.items[i].font[check.property] !== "None") {
-                            isCorrect = true;
-                            break;
-                        } else if (check.property === "color") {
+                        if (check.property === "highlightColor" || check.property === "color") {
                             if (Array.isArray(check.expected) && check.expected.includes(search.items[i].font[check.property])) {
                                 isCorrect = true;
                                 break;
                             }
+                        } else if (check.property === "underline" && search.items[i].font[check.property] !== "None") {
+                            isCorrect = true;
+                            break;
                         } else if (search.items[i].font[check.property] === check.expected) {
                             isCorrect = true;
                             break;
