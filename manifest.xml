@@ -2,15 +2,17 @@
 <OfficeApp xmlns="http://schemas.microsoft.com/office/appforoffice/1.1"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:type="TaskPaneApp">
-  <Id>0c9c86ab-8130-416d-8a57-b1812f3b6b7f</Id>  <Version>1.0</Version>
+  <Id>YOUR_GUID_HERE</Id>
+  <Version>1.0</Version>
   <ProviderName>Your Name</ProviderName>
   <DefaultLocale>en-US</DefaultLocale>
-  <DisplayName>Word Add-in</DisplayName>
-  <Description>Checks for bold words in a Word document.</Description>
+  <DisplayName>Format Checker</DisplayName>
+  <Description>Checks for specific formatting in a Word document.</Description>
   <Hosts>
     <Host Name="Word"/>
   </Hosts>
   <DefaultSettings>
-    <SourceLocation DefaultValue="https://shannheiner.github.io/addin-jump/index.html"/>  </DefaultSettings>
-  <Permissions>ReadWriteDocument</Permissions>
+    <SourceLocation DefaultValue="https://shannheiner.github.io/addin-jump/index.html"/>
+  </DefaultSettings>
+  <Permissions>ReadDocument</Permissions>
 </OfficeApp>

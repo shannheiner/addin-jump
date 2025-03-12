@@ -1,90 +1,38 @@
-// The initialize function must be run each time a new page is loaded
-Office.initialize = function (reason) {
-    $(document).ready(function () {
-        // Add event handlers
-        $('#check-format').click(checkFormatting);
-    });
-};
+Office.onReady(function (info) {
+    document.getElementById("checkFormat").addEventListener("click", checkFormatting);
+});
 
-/**
- * Check the formatting of specific words/phrases in the document
- */
-function checkFormatting() {
-    return Word.run(async function (context) {
-        // Define the terms to check and their expected formatting
-        const termsToCheck = [
-            { text: "Bold 1", format: "bold" },
-            { text: "Bold 2", format: "bold" },
-            { text: "Highlighted Green", format: "highlightedGreen" },
-            { text: "Underline1", format: "underline" }
-        ];
+async function checkFormatting() {
+    try {
+        await Word.run(async (context) => {
+            let formatChecks = [
+                { text: "Bold 1", property: "bold", expected: true },
+                { text: "Bold 2", property: "bold", expected: true },
+                { text: "Highlighted Green", property: "highlightColor", expected: "green" },
+                { text: "Underline1", property: "underline", expected: true }
+            ];
 
-        // Get the whole document body
-        const body = context.document.body;
-        context.load(body, 'text');
-        
-        // Execute the search and load operations
-        await context.sync();
-        
-        // Clear previous results
-        $('#results').empty();
-        
-        // Check each term one by one
-        for (const term of termsToCheck) {
-            // Search for instances of the term
-            const searchResults = body.search(term.text, { matchCase: true, matchWholeWord: true });
-            context.load(searchResults, 'text, font');
-            
-            await context.sync();
-            
-            // Process each search result
-            if (searchResults.items.length > 0) {
-                for (let i = 0; i < searchResults.items.length; i++) {
-                    let isCorrectlyFormatted = false;
-                    
-                    switch (term.format) {
-                        case "bold":
-                            isCorrectlyFormatted = searchResults.items[i].font.bold;
+            let results = [];
+            for (let check of formatChecks) {
+                let search = context.document.body.search(check.text, { matchWholeWord: true });
+                search.load("items/font");
+                await context.sync();
+
+                let isCorrect = false;
+                if (search.items.length > 0) {
+                    for (let i = 0; i < search.items.length; i++) {
+                        if (search.items[i].font[check.property] === check.expected) {
+                            isCorrect = true;
                             break;
-                        case "highlightedGreen":
-                            isCorrectlyFormatted = searchResults.items[i].font.highlightColor === 'Green';
-                            break;
-                        case "underline":
-                            isCorrectlyFormatted = searchResults.items[i].font.underline;
-                            break;
+                        }
                     }
-                    
-                    // Display the result
-                    const resultClass = isCorrectlyFormatted ? 'correct' : 'incorrect';
-                    const resultText = isCorrectlyFormatted 
-                        ? `${term.text}: Correct` 
-                        : `${term.text}: Incorrect`;
-                    
-                    $('#results').append(`
-                        <div class="result-item ${resultClass}">
-                            ${resultText}
-                        </div>
-                    `);
                 }
-            } else {
-                // Term not found
-                $('#results').append(`
-                    <div class="result-item">
-                        "${term.text}": Not found in document
-                    </div>
-                `);
+                results.push(`<p>${check.text}: ${isCorrect ? "Correct" : "Incorrect"}</p>`);
             }
-        }
-        
-        return context.sync();
-    })
-    .catch(function (error) {
-        console.log("Error: " + JSON.stringify(error));
-        if (error instanceof OfficeExtension.Error) {
-            console.log("Debug info: " + JSON.stringify(error.debugInfo));
-        }
-        
-        // Display error in the results area
-        $('#results').html(`<div class="result-item incorrect">Error: ${error.message}</div>`);
-    });
+            document.getElementById("result").innerHTML = results.join("");
+        });
+    } catch (error) {
+        console.error("Error:", error);
+        document.getElementById("result").innerHTML = "Error: " + error.message;
+    }
 }
