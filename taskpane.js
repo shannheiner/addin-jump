@@ -19,9 +19,9 @@ async function checkFormatting() {
                 { text: "Font Type: Times New Roman", property: "name", expected: "Times New Roman" },
                 { text: "Font Type: Comic Sans MS", property: "name", expected: "Comic Sans MS" },
                 { text: "Font Type: Consolas", property: "name", expected: "Consolas" },
-                { text: "Font Color: Red", property: "color", expected: "#FF0000" },
-                { text: "Font Color: Dark Green", property: "color", expected: "#008000" },
-                { text: "Font Color: Purple", property: "color", expected: "#800080" },
+                { text: "Font Color: Red", property: "color", expected: ["#FF0000", "red"] },
+                { text: "Font Color: Dark Green", property: "color", expected: ["#008000", "darkgreen"] },
+                { text: "Font Color: Purple", property: "color", expected: ["#800080", "purple"] },
                 { text: "Highlighted Green", property: "highlightColor", expected: "#00FF00" },
                 { text: "Highlight Cyan", property: "highlightColor", expected: "cyan" },
                 { text: "Highlight Light Gray", property: "highlightColor", expected: "lightgrey" },
@@ -46,7 +46,12 @@ async function checkFormatting() {
                         } else if (check.property === "underline" && search.items[i].font[check.property] !== "None") {
                             isCorrect = true;
                             break;
-                        } else if (check.property !== "highlightColor" && check.property !== "underline" && search.items[i].font[check.property] === check.expected) {
+                        } else if (check.property === "color") {
+                            if (Array.isArray(check.expected) && check.expected.includes(search.items[i].font[check.property])) {
+                                isCorrect = true;
+                                break;
+                            }
+                        } else if (search.items[i].font[check.property] === check.expected) {
                             isCorrect = true;
                             break;
                         }
