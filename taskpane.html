@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Format Checker Add-in</title>
+
+    <!-- Office JavaScript API -->
+    <script type="text/javascript" src="https://appsforoffice.microsoft.com/lib/1.1/hosted/office.js"></script>
+
+    <!-- jQuery library -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <!-- Office UI Fabric stylesheet -->
+    <link rel="stylesheet" href="https://static2.sharepointonline.com/files/fabric/office-ui-fabric-core/11.0.0/css/fabric.min.css" />
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" type="text/css" href="taskpane.css">
+</head>
+
+<body class="ms-font-m ms-Fabric">
+    <div id="container">
+        <header class="ms-bgColor-themePrimary ms-fontColor-white">
+            <h1>Format Checker</h1>
+        </header>
+        <main>
+            <div class="padding">
+                <button id="check-format" class="ms-Button ms-Button--primary">
+                    <span class="ms-Button-label">Check Formatting</span>
+                </button>
+                <div id="results" class="results">
+                    <p>Click the button to check document formatting.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- JavaScript -->
+    <script type="text/javascript" src="taskpane.js"></script>
+</body>
+</html>

@@ -1,93 +1,90 @@
-// Variable to track if an operation is in progress
-let isProcessing = false;
-
-Office.onReady(function (info) {
-    document.getElementById("checkBold").addEventListener("click", function() {
-        if (!isProcessing) {
-            checkFormatting();
-        } else {
-            document.getElementById("result").innerHTML = "Please wait, still processing...";
-        }
+// The initialize function must be run each time a new page is loaded
+Office.initialize = function (reason) {
+    $(document).ready(function () {
+        // Add event handlers
+        $('#check-format').click(checkFormatting);
     });
+};
 
-    // Add Login Button Event
-    document.getElementById("login-btn").addEventListener("click", async () => {
-        const provider = new GoogleAuthProvider();
-        try {
-            const result = await signInWithPopup(auth, provider);
-            const user = result.user;
-            document.getElementById("user-info").innerText = `Logged in as: ${user.email}`;
-        } catch (error) {
-            console.error("Login failed:", error);
-            document.getElementById("user-info").innerText = "Login failed. Try again.";
-        }
-    });
-});
-
-async function checkFormatting() {
-    try {
-        isProcessing = true;
-        document.getElementById("result").innerHTML = "Checking formatting...";
-
-        const formatChecks = [
-            { text: "Bold 1", property: "bold", expected: true },
-            { text: "Bold 2", property: "bold", expected: true },
-            { text: "Italic 1", property: "italic", expected: true },
-            { text: "Italic 2", property: "italic", expected: true },
-            { text: "Underline 1", property: "underline", expected: true },
-            { text: "Underline 2", property: "underline", expected: true },
-            { text: "Font Type: Calibri", property: "name", expected: "Calibri" },
-            { text: "Font Type: Times New Roman", property: "name", expected: "Times New Roman" },
-            { text: "Font Size: 12", property: "size", expected: 12 },
-            { text: "Font Size: 14", property: "size", expected: 14 },
-            { text: "Font Color: Red", property: "color", expected: "#FF0000" },
-            { text: "Font Color: Blue", property: "color", expected: "#0000FF" },
-            { text: "Highlight: Yellow", property: "highlightColor", expected: "yellow" }
+/**
+ * Check the formatting of specific words/phrases in the document
+ */
+function checkFormatting() {
+    return Word.run(async function (context) {
+        // Define the terms to check and their expected formatting
+        const termsToCheck = [
+            { text: "Bold 1", format: "bold" },
+            { text: "Bold 2", format: "bold" },
+            { text: "Highlighted Green", format: "highlightedGreen" },
+            { text: "Underline1", format: "underline" }
         ];
 
-        await Word.run(async (context) => {
-            let results = [];
-            let searches = [];
-
-            // Collect all searches before syncing
-            for (const check of formatChecks) {
-                let search = context.document.body.search(check.text, { matchCase: false, matchWholeWord: false });
-                search.load("items/font");
-                searches.push({ search, check });
-            }
-
-            await context.sync(); // Sync all at once
-
-            for (const { search, check } of searches) {
-                let isCorrect = false;
-                console.log(`Checking: ${check.text} - Found: ${search.items.length}`);
-
-                if (search.items.length > 0) {
-                    for (let item of search.items) {
-                        let fontProperty = item.font[check.property];
-                        
-                        // Normalize data types for comparison
-                        if (typeof fontProperty === "boolean") {
-                            isCorrect = fontProperty === check.expected;
-                        } else if (typeof fontProperty === "number") {
-                            isCorrect = Math.round(fontProperty) === check.expected;
-                        } else {
-                            isCorrect = fontProperty.toString().toLowerCase() === check.expected.toString().toLowerCase();
-                        }
-
-                        if (isCorrect) break; // Stop checking if a match is found
+        // Get the whole document body
+        const body = context.document.body;
+        context.load(body, 'text');
+        
+        // Execute the search and load operations
+        await context.sync();
+        
+        // Clear previous results
+        $('#results').empty();
+        
+        // Check each term one by one
+        for (const term of termsToCheck) {
+            // Search for instances of the term
+            const searchResults = body.search(term.text, { matchCase: true, matchWholeWord: true });
+            context.load(searchResults, 'text, font');
+            
+            await context.sync();
+            
+            // Process each search result
+            if (searchResults.items.length > 0) {
+                for (let i = 0; i < searchResults.items.length; i++) {
+                    let isCorrectlyFormatted = false;
+                    
+                    switch (term.format) {
+                        case "bold":
+                            isCorrectlyFormatted = searchResults.items[i].font.bold;
+                            break;
+                        case "highlightedGreen":
+                            isCorrectlyFormatted = searchResults.items[i].font.highlightColor === 'Green';
+                            break;
+                        case "underline":
+                            isCorrectlyFormatted = searchResults.items[i].font.underline;
+                            break;
                     }
+                    
+                    // Display the result
+                    const resultClass = isCorrectlyFormatted ? 'correct' : 'incorrect';
+                    const resultText = isCorrectlyFormatted 
+                        ? `${term.text}: Correct` 
+                        : `${term.text}: Incorrect`;
+                    
+                    $('#results').append(`
+                        <div class="result-item ${resultClass}">
+                            ${resultText}
+                        </div>
+                    `);
                 }
-
-                results.push(`<div>${check.text}: <span style='color: ${isCorrect ? "green" : "red"};'>${isCorrect ? "Correct" : "Incorrect"}</span></div>`);
+            } else {
+                // Term not found
+                $('#results').append(`
+                    <div class="result-item">
+                        "${term.text}": Not found in document
+                    </div>
+                `);
             }
-
-            document.getElementById("result").innerHTML = `<div style='max-height: 400px; overflow-y: auto;'>${results.join(" ")}</div>`;
-        });
-    } catch (error) {
-        console.error("Error in Word.run:", error);
-        document.getElementById("result").innerHTML = "Error: " + error.message;
-    } finally {
-        isProcessing = false;
-    }
+        }
+        
+        return context.sync();
+    })
+    .catch(function (error) {
+        console.log("Error: " + JSON.stringify(error));
+        if (error instanceof OfficeExtension.Error) {
+            console.log("Debug info: " + JSON.stringify(error.debugInfo));
+        }
+        
+        // Display error in the results area
+        $('#results').html(`<div class="result-item incorrect">Error: ${error.message}</div>`);
+    });
 }
