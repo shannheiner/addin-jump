@@ -21,9 +21,15 @@ async function checkFormatting() {
                 search.load("items/font");
                 await context.sync();
 
+                console.log(search.items); // Inspect search results
+
                 let isCorrect = false;
                 if (search.items.length > 0) {
                     for (let i = 0; i < search.items.length; i++) {
+                        console.log(search.items[i].font); // Inspect font object
+                        console.log("Highlight Color:", search.items[i].font.highlightColor); // Inspect highlight color
+                        console.log("Underline:", search.items[i].font.underline); // Inspect underline
+
                         if (search.items[i].font[check.property] === check.expected) {
                             isCorrect = true;
                             break;
