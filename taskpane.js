@@ -24,7 +24,7 @@ async function checkFormatting() {
                 { text: "Font_Color_Purple", property: "color", expected: ["#800080", "purple"] },
                 { text: "Highlighted_Green", property: "highlightColor", expected: ["#00FF00", "green"] },
                 { text: "Highlight_Cyan", property: "highlightColor", expected: ["cyan", "#00FFFF"] },
-                { text: "Highlight_Light_Gray", property: "highlightColor", expected: ["lightgrey", "#D3D3D3"] },
+                { text: "Highlight_Yellow", property: "highlightColor", expected: ["yellow", "#FFFF00"] },
                 { text: "Font Size: 14", property: "size", expected: 14 },
                 { text: "Font Size: 16", property: "size", expected: 16 },
                 { text: "Font Size: 19", property: "size", expected: 19 },
