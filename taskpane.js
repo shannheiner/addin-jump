@@ -42,6 +42,11 @@ async function checkFormatting() {
 
                 if (isFound) {
                     for (let i = 0; i < search.items.length; i++) {
+
+                        console.log("Word:", search.items[i].text); // Log the word itself
+                        console.log("Font Color:", search.items[i].font.color); // Log the font color
+                        console.log("Highlight Color:", search.items[i].font.highlightColor); // Log the highlight color
+
                         if (check.property === "highlightColor" || check.property === "color") {
                             if (Array.isArray(check.expected) && check.expected.includes(search.items[i].font[check.property])) {
                                 isCorrect = true;
