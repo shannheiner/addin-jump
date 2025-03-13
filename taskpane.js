@@ -34,7 +34,11 @@ async function checkFormatting() {
             let results = [];
             for (let check of formatChecks) {
                 let search = context.document.body.search(check.text, { matchWholeWord: true });
-                search.load("items/font");
+                search.load("items/font, items/text"); // Load both font and text
+
+
+                //let search = context.document.body.search(check.text, { matchWholeWord: true });
+                //search.load("items/font");
                 await context.sync();
 
                 let isCorrect = false;
