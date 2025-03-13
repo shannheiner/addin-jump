@@ -20,7 +20,7 @@ async function checkFormatting() {
                 { text: "Font Type: Comic Sans MS", property: "name", expected: "Comic Sans MS" },
                 { text: "Font Type: Consolas", property: "name", expected: "Consolas" },
                 { text: "Font Color: Red", property: "color", expected: ["#FF0000", "red"] },
-                { text: "Font Color: Dark Green", property: "color", expected: ["#008000", "darkgreen"] },
+                { text: "Font Color: Dark Green", property: "color", expected: ["#008000", "green"] },
                 { text: "Font Color: Purple", property: "color", expected: ["#800080", "purple"] },
                 { text: "Highlighted Green", property: "highlightColor", expected: ["#00FF00", "green"] },
                 { text: "Highlight Cyan", property: "highlightColor", expected: ["cyan", "#00FFFF"] },
@@ -38,7 +38,9 @@ async function checkFormatting() {
                 await context.sync();
 
                 let isCorrect = false;
-                if (search.items.length > 0) {
+                let isFound = search.items.length > 0; // Check if the word is found
+
+                if (isFound) {
                     for (let i = 0; i < search.items.length; i++) {
                         if (check.property === "highlightColor" || check.property === "color") {
                             if (Array.isArray(check.expected) && check.expected.includes(search.items[i].font[check.property])) {
@@ -54,7 +56,12 @@ async function checkFormatting() {
                         }
                     }
                 }
-                results.push(`<p style="background-color: ${isCorrect ? 'lightgreen' : 'lightcoral'};">${check.text}: ${isCorrect ? "Correct" : "Incorrect"}</p>`);
+
+                if (!isFound) {
+                    results.push(`<p style="background-color: lightyellow;">${check.text}: Not Found</p>`); // Highlight yellow if not found
+                } else {
+                    results.push(`<p style="background-color: ${isCorrect ? 'lightgreen' : 'lightcoral'};">${check.text}: ${isCorrect ? "Correct" : "Incorrect"}</p>`); // Highlight green or red
+                }
             }
             document.getElementById("result").innerHTML = results.join("");
         });
