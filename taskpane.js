@@ -34,19 +34,19 @@ async function checkFormatting() {
             let results = [];
             for (let check of formatChecks) {
                 let search = context.document.body.search(check.text, { matchWholeWord: true });
-                search.load("items/font, items/text"); // Load both font and text
+                search.load("items/font, items/text");
                 await context.sync();
 
                 let isCorrect = false;
-                let isFound = search.items.length > 0; // Check if the word is found
+                let isFound = search.items.length > 0;
 
                 if (isFound) {
                     for (let i = 0; i < search.items.length; i++) {
                         let fontColor = search.items[i].font[check.property];
 
-                        console.log("Word:", search.items[i].text); // Log the word itself
-                        console.log("Font Color:", fontColor); // Log the font color
-                        console.log("Highlight Color:", search.items[i].font.highlightColor); // Log the highlight color
+                        console.log("Word:", search.items[i].text);
+                        console.log("Font Color:", fontColor);
+                        console.log("Highlight Color:", search.items[i].font.highlightColor);
 
                         if (check.property === "highlightColor" || check.property === "color") {
                             if (Array.isArray(check.expected) && check.expected.includes(fontColor)) {
@@ -54,8 +54,9 @@ async function checkFormatting() {
                                 break;
                             }
 
-                            // Check for a range of green shades using isGreenColor
-                            if (check.text.includes("Green") && isGreenColor(fontColor)) {
+                            // Check for green or purple shades
+                            if ((check.text.includes("Green") && isGreenColor(fontColor)) || 
+                                (check.text.includes("Purple") && isPurpleColor(fontColor))) {
                                 isCorrect = true;
                                 break;
                             }
@@ -70,9 +71,9 @@ async function checkFormatting() {
                 }
 
                 if (!isFound) {
-                    results.push(`<p style="background-color: lightyellow;">${check.text}: Not Found</p>`); // Highlight yellow if not found
+                    results.push(`<p style="background-color: lightyellow;">${check.text}: Not Found</p>`);
                 } else {
-                    results.push(`<p style="background-color: ${isCorrect ? 'lightgreen' : 'lightcoral'};">${check.text}: ${isCorrect ? "Correct" : "Incorrect"}</p>`); // Highlight green or red
+                    results.push(`<p style="background-color: ${isCorrect ? 'lightgreen' : 'lightcoral'};">${check.text}: ${isCorrect ? "Correct" : "Incorrect"}</p>`);
                 }
             }
             document.getElementById("result").innerHTML = results.join("");
@@ -86,12 +87,24 @@ async function checkFormatting() {
 // Function to check if a color is a shade of green
 function isGreenColor(color) {
     if (color.startsWith("#") && color.length === 7) {
-        let r = parseInt(color.substring(1, 3), 16); // Red
-        let g = parseInt(color.substring(3, 5), 16); // Green
-        let b = parseInt(color.substring(5, 7), 16); // Blue
+        let r = parseInt(color.substring(1, 3), 16);
+        let g = parseInt(color.substring(3, 5), 16);
+        let b = parseInt(color.substring(5, 7), 16);
 
-        // Check if green is the dominant color
         return g > 80 && g >= r * 1.5 && g >= b * 1.5;
+    }
+    return false;
+}
+
+// Function to check if a color is a shade of purple
+function isPurpleColor(color) {
+    if (color.startsWith("#") && color.length === 7) {
+        let r = parseInt(color.substring(1, 3), 16);
+        let g = parseInt(color.substring(3, 5), 16);
+        let b = parseInt(color.substring(5, 7), 16);
+
+        // Purple is typically when red and blue are strong and green is weak
+        return r > 60 && b > 60 && g < 80;
     }
     return false;
 }
