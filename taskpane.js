@@ -35,10 +35,6 @@ async function checkFormatting() {
             for (let check of formatChecks) {
                 let search = context.document.body.search(check.text, { matchWholeWord: true });
                 search.load("items/font, items/text"); // Load both font and text
-
-
-                //let search = context.document.body.search(check.text, { matchWholeWord: true });
-                //search.load("items/font");
                 await context.sync();
 
                 let isCorrect = false;
@@ -46,13 +42,20 @@ async function checkFormatting() {
 
                 if (isFound) {
                     for (let i = 0; i < search.items.length; i++) {
+                        let fontColor = search.items[i].font[check.property];
 
                         console.log("Word:", search.items[i].text); // Log the word itself
-                        console.log("Font Color:", search.items[i].font.color); // Log the font color
+                        console.log("Font Color:", fontColor); // Log the font color
                         console.log("Highlight Color:", search.items[i].font.highlightColor); // Log the highlight color
 
                         if (check.property === "highlightColor" || check.property === "color") {
-                            if (Array.isArray(check.expected) && check.expected.includes(search.items[i].font[check.property])) {
+                            if (Array.isArray(check.expected) && check.expected.includes(fontColor)) {
+                                isCorrect = true;
+                                break;
+                            }
+
+                            // Check for a range of green shades using isGreenColor
+                            if (check.text.includes("Green") && isGreenColor(fontColor)) {
                                 isCorrect = true;
                                 break;
                             }
@@ -78,4 +81,17 @@ async function checkFormatting() {
         console.error("Error:", error);
         document.getElementById("result").innerHTML = "Error: " + error.message;
     }
+}
+
+// Function to check if a color is a shade of green
+function isGreenColor(color) {
+    if (color.startsWith("#") && color.length === 7) {
+        let r = parseInt(color.substring(1, 3), 16); // Red
+        let g = parseInt(color.substring(3, 5), 16); // Green
+        let b = parseInt(color.substring(5, 7), 16); // Blue
+
+        // Check if green is the dominant color
+        return g > 80 && g >= r * 1.5 && g >= b * 1.5;
+    }
+    return false;
 }
