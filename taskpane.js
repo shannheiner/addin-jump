@@ -4,7 +4,8 @@ Office.onReady(function (info) {
 
 async function checkFormatting() {
     try {
-        document.getElementById("result").innerHTML = ""; // Reset results
+        // Reset the results area
+        document.getElementById("result").innerHTML = "";
 
         await Word.run(async (context) => {
             let formatChecks = [
@@ -12,7 +13,7 @@ async function checkFormatting() {
                 { text: "Italic1", property: "italic", expected: true },
                 { text: "Underline1", property: "underline", expected: "exists" },
                 { text: "Subscript1", property: "subscript", expected: true },
-                { text: "Strikethrough1", property: "strikethrough", expected: true },
+                { text: "Strikethrough1", property: "strikeThrough", expected: true }, // Updated property name
                 { text: "Superscript1", property: "superscript", expected: true },
                 { text: "Font_Type_Calibri", property: "name", expected: "Calibri" },
                 { text: "Font_Type_Times New Roman", property: "name", expected: "Times New Roman" },
@@ -33,62 +34,49 @@ async function checkFormatting() {
             let results = [];
             for (let check of formatChecks) {
                 let search = context.document.body.search(check.text, { matchWholeWord: true });
+                search.load("items/font, items/font/bold, items/font/italic, items/font/underline, items/font/strikeThrough, items/font/color, items/font/highlightColor, items/font/name, items/font/size, items/text");
 
-                // ✅ Load ALL necessary font properties
-                search.load("items/font, items/font/bold, items/font/italic, items/font/underline, items/font/strikethrough, items/font/doubleStrikeThrough, items/font/subscript, items/font/superscript, items/font/color, items/font/highlightColor, items/font/name, items/font/size, items/text");
-
-                await context.sync(); // Ensure properties are loaded
+                await context.sync();
 
                 let isCorrect = false;
                 let isFound = search.items.length > 0;
 
                 if (isFound) {
                     for (let i = 0; i < search.items.length; i++) {
-                        let font = search.items[i].font;
-                        let fontValue = font[check.property];
+                        let fontProperty = search.items[i].font[check.property];
 
-                        console.log(`Checking: ${search.items[i].text}`);
-                        console.log(`${check.property}:`, fontValue);
+                        console.log("Word:", search.items[i].text);
+                        console.log("Font Property:", fontProperty);
+                        console.log("Highlight Color:", search.items[i].font.highlightColor);
+                        console.log("Strikethrough:", search.items[i].font.strikeThrough); // Debugging strikethrough
 
-                        // ✅ Fix strikethrough checking (use both properties)
-                        if (check.property === "strikethrough") {
-                            if (font.strikethrough || font.doubleStrikeThrough) {
+                        if (check.property === "highlightColor" || check.property === "color") {
+                            if (Array.isArray(check.expected) && check.expected.includes(fontProperty)) {
+                                isCorrect = true;
+                                break;
+                            }
+
+                            // Check for green or purple shades
+                            if ((check.text.includes("Green") && isGreenColor(fontProperty)) || 
+                                (check.text.includes("Purple") && isPurpleColor(fontProperty))) {
+                                isCorrect = true;
+                                break;
+                            }
+                        } 
+                        // Check for strikethrough
+                        else if (check.property === "strikeThrough") {
+                            if (search.items[i].font.strikeThrough) {
                                 isCorrect = true;
                                 break;
                             }
                         }
-                        // ✅ Check for font color (including shades of green and purple)
-                        else if (check.property === "color") {
-                            if (Array.isArray(check.expected) && check.expected.includes(font.color)) {
-                                isCorrect = true;
-                                break;
-                            }
-                            if ((check.text.includes("Green") && isGreenColor(font.color)) ||
-                                (check.text.includes("Purple") && isPurpleColor(font.color))) {
-                                isCorrect = true;
-                                break;
-                            }
-                        }
-                        // ✅ Check for highlight color
-                        else if (check.property === "highlightColor") {
-                            if (Array.isArray(check.expected) && check.expected.includes(font.highlightColor)) {
-                                isCorrect = true;
-                                break;
-                            }
-                        }
-                        // ✅ Check for underline (must not be "None")
-                        else if (check.property === "underline" && font.underline !== "None") {
+                        // Check for underline
+                        else if (check.property === "underline" && search.items[i].font[check.property] !== "None") {
                             isCorrect = true;
                             break;
-                        }
-                        // ✅ Check for subscript and superscript
-                        else if ((check.property === "subscript" && font.subscript) || 
-                                 (check.property === "superscript" && font.superscript)) {
-                            isCorrect = true;
-                            break;
-                        }
-                        // ✅ General property check
-                        else if (fontValue === check.expected) {
+                        } 
+                        // General formatting check
+                        else if (search.items[i].font[check.property] === check.expected) {
                             isCorrect = true;
                             break;
                         }
@@ -109,7 +97,7 @@ async function checkFormatting() {
     }
 }
 
-// ✅ Function to check if a color is a shade of green
+// Function to check if a color is a shade of green
 function isGreenColor(color) {
     if (color.startsWith("#") && color.length === 7) {
         let r = parseInt(color.substring(1, 3), 16);
@@ -121,14 +109,10 @@ function isGreenColor(color) {
     return false;
 }
 
-// ✅ Function to check if a color is a shade of purple
+// Function to check if a color is a shade of purple
 function isPurpleColor(color) {
     if (color.startsWith("#") && color.length === 7) {
         let r = parseInt(color.substring(1, 3), 16);
-        let g = parseInt(color.substring(3, 5), 16);
-        let b = parseInt(color.substring(5, 7), 16);
-
-        return r > 60 && b > 60 && g < 80;
-    }
-    return false;
-}
+        let g = parseInt(color.substring(3, 
+::contentReference[oaicite:1]{index=1}
+ 
