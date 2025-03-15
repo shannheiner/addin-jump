@@ -34,8 +34,8 @@ async function checkFormatting() {
             for (let check of formatChecks) {
                 let search = context.document.body.search(check.text, { matchWholeWord: true });
 
-                // ✅ Load all necessary font properties explicitly
-                search.load("items/font, items/font/bold, items/font/italic, items/font/underline, items/font/strikethrough, items/font/subscript, items/font/superscript, items/font/color, items/font/highlightColor, items/font/name, items/font/size, items/text");
+                // ✅ Load ALL necessary font properties
+                search.load("items/font, items/font/bold, items/font/italic, items/font/underline, items/font/strikethrough, items/font/doubleStrikeThrough, items/font/subscript, items/font/superscript, items/font/color, items/font/highlightColor, items/font/name, items/font/size, items/text");
 
                 await context.sync(); // Ensure properties are loaded
 
@@ -50,30 +50,44 @@ async function checkFormatting() {
                         console.log(`Checking: ${search.items[i].text}`);
                         console.log(`${check.property}:`, fontValue);
 
-                        // Color and Highlight Color checks
-                        if (["color", "highlightColor"].includes(check.property)) {
-                            if (Array.isArray(check.expected) && check.expected.includes(fontValue)) {
+                        // ✅ Fix strikethrough checking (use both properties)
+                        if (check.property === "strikethrough") {
+                            if (font.strikethrough || font.doubleStrikeThrough) {
                                 isCorrect = true;
                                 break;
                             }
                         }
-                        // Check for strikethrough
-                        else if (check.property === "strikethrough" && font.strikethrough) {
-                            isCorrect = true;
-                            break;
+                        // ✅ Check for font color (including shades of green and purple)
+                        else if (check.property === "color") {
+                            if (Array.isArray(check.expected) && check.expected.includes(font.color)) {
+                                isCorrect = true;
+                                break;
+                            }
+                            if ((check.text.includes("Green") && isGreenColor(font.color)) ||
+                                (check.text.includes("Purple") && isPurpleColor(font.color))) {
+                                isCorrect = true;
+                                break;
+                            }
                         }
-                        // Check for underline (must not be "None")
+                        // ✅ Check for highlight color
+                        else if (check.property === "highlightColor") {
+                            if (Array.isArray(check.expected) && check.expected.includes(font.highlightColor)) {
+                                isCorrect = true;
+                                break;
+                            }
+                        }
+                        // ✅ Check for underline (must not be "None")
                         else if (check.property === "underline" && font.underline !== "None") {
                             isCorrect = true;
                             break;
                         }
-                        // Check for subscript and superscript
+                        // ✅ Check for subscript and superscript
                         else if ((check.property === "subscript" && font.subscript) || 
                                  (check.property === "superscript" && font.superscript)) {
                             isCorrect = true;
                             break;
                         }
-                        // General property check
+                        // ✅ General property check
                         else if (fontValue === check.expected) {
                             isCorrect = true;
                             break;
@@ -93,4 +107,28 @@ async function checkFormatting() {
         console.error("Error:", error);
         document.getElementById("result").innerHTML = "Error: " + error.message;
     }
+}
+
+// ✅ Function to check if a color is a shade of green
+function isGreenColor(color) {
+    if (color.startsWith("#") && color.length === 7) {
+        let r = parseInt(color.substring(1, 3), 16);
+        let g = parseInt(color.substring(3, 5), 16);
+        let b = parseInt(color.substring(5, 7), 16);
+
+        return g > 80 && g >= r * 1.5 && g >= b * 1.5;
+    }
+    return false;
+}
+
+// ✅ Function to check if a color is a shade of purple
+function isPurpleColor(color) {
+    if (color.startsWith("#") && color.length === 7) {
+        let r = parseInt(color.substring(1, 3), 16);
+        let g = parseInt(color.substring(3, 5), 16);
+        let b = parseInt(color.substring(5, 7), 16);
+
+        return r > 60 && b > 60 && g < 80;
+    }
+    return false;
 }
