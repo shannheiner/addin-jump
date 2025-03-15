@@ -35,7 +35,9 @@ async function checkFormatting() {
             for (let check of formatChecks) {
                 let search = context.document.body.search(check.text, { matchWholeWord: true });
               //  search.load("items/font, items/text");
-                search.load("items/font, items/font/strikethrough, items/text");
+             //   search.load("items/font, items/font/strikethrough, items/text");
+                search.load("items/font, items/font/bold, items/font/italic, items/font/underline, items/font/strikethrough, items/font/color, items/font/highlightColor, items/font/name, items/font/size, items/text");
+
 
                 await context.sync();
 
