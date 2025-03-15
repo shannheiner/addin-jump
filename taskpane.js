@@ -13,7 +13,7 @@ async function checkFormatting() {
                 { text: "Underline1", property: "underline", expected: "exists" },
                 { text: "Subscript1", property: "subscript", expected: true },
                 { text: "Superscript1", property: "superscript", expected: true },
-                { text: "Strikethrough1", property: "strikethrough", expected: true },
+                { text: "Strikethrough1", property: "strikeThrough", expected: true }, // Updated property name
                 { text: "Font_Type_Calibri", property: "name", expected: "Calibri" },
                 { text: "Font_Type_Times New Roman", property: "name", expected: "Times New Roman" },
                 { text: "Font_Type_Comic Sans MS", property: "name", expected: "Comic Sans MS" },
@@ -36,7 +36,7 @@ async function checkFormatting() {
 
             for (let check of formatChecks) {
                 let search = context.document.body.search(check.text, { matchWholeWord: true });
-                search.load("items/font, items/font/bold, items/font/italic, items/font/underline, items/font/strikethrough, items/font/subscript, items/font/superscript, items/font/color, items/font/highlightColor, items/font/name, items/font/size, items/text");
+                search.load("items/font, items/font/bold, items/font/italic, items/font/underline, items/font/strikeThrough, items/font/subscript, items/font/superscript, items/font/color, items/font/highlightColor, items/font/name, items/font/size, items/text");
                 await context.sync();
 
                 let isCorrect = false;
