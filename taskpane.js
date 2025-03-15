@@ -47,6 +47,7 @@ async function checkFormatting() {
                         console.log("Word:", search.items[i].text);
                         console.log("Font Color:", fontColor);
                         console.log("Highlight Color:", search.items[i].font.highlightColor);
+                        console.log("Strikethrough:", search.items[i].font.strikethrough); // Debugging strikethrough
 
                         if (check.property === "highlightColor" || check.property === "color") {
                             if (Array.isArray(check.expected) && check.expected.includes(fontColor)) {
@@ -60,10 +61,21 @@ async function checkFormatting() {
                                 isCorrect = true;
                                 break;
                             }
-                        } else if (check.property === "underline" && search.items[i].font[check.property] !== "None") {
+                        } 
+                        // Check for strikethrough
+                        else if (check.property === "strikethrough") {
+                            if (search.items[i].font.strikethrough) {
+                                isCorrect = true;
+                                break;
+                            }
+                        }
+                        // Check for underline
+                        else if (check.property === "underline" && search.items[i].font[check.property] !== "None") {
                             isCorrect = true;
                             break;
-                        } else if (search.items[i].font[check.property] === check.expected) {
+                        } 
+                        // General formatting check
+                        else if (search.items[i].font[check.property] === check.expected) {
                             isCorrect = true;
                             break;
                         }
