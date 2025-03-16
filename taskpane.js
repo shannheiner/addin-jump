@@ -27,7 +27,7 @@ async function checkFormatting() {
                 { text: "Font_Size_14", property: "size", expected: 14 },
                 { text: "Font_Size_16", property: "size", expected: 16 },
                 { text: "Font_Size_19", property: "size", expected: 19 },
-                { text: "Font_Size_24", property: "size", expected: 24 }
+                { text: "Font_Size_24", property: "size", expected: 24 },
 
                 { text: "Bold2", property: "bold", expected: true },
                 { text: "Italic2", property: "italic", expected: true },
@@ -38,17 +38,17 @@ async function checkFormatting() {
                 { text: "Font_Type_Verdana Pro", property: "name", expected: "Verdana Pro" },
                 { text: "Font_Type_Cooper Black", property: "name", expected: "Cooper Black" },
                 { text: "Font_Type_Comic Sans MS", property: "name", expected: "Comic Sans MS" },
-                { text: "Font_Type_Consolas", property: "name", expected: "Consolas" },
-                { text: "Font_Color_Red", property: "color", expected: ["#FF0000", "red"] },
-                { text: "Font_Color_Dark_Green", property: "color", expected: ["#008000", "green"] },
-                { text: "Font_Color_Purple", property: "color", expected: ["#800080", "purple"] },
-                { text: "Highlighted_Green", property: "highlightColor", expected: ["#00FF00", "green"] },
-                { text: "Highlight_Cyan", property: "highlightColor", expected: ["cyan", "#00FFFF"] },
-                { text: "Highlight_Yellow", property: "highlightColor", expected: ["yellow", "#FFFF00"] },
-                { text: "Font_Size_14", property: "size", expected: 14 },
-                { text: "Font_Size_16", property: "size", expected: 16 },
-                { text: "Font_Size_19", property: "size", expected: 19 },
-                { text: "Font_Size_24", property: "size", expected: 24 }
+                { text: "Font_Type_Consolas2", property: "name", expected: "Consolas" },
+                { text: "Font_Color_Red2", property: "color", expected: ["#FF0000", "red"] },
+                { text: "Font_Color_Dark_Green2", property: "color", expected: ["#008000", "green"] },
+                { text: "Font_Color_Purple2", property: "color", expected: ["#800080", "purple"] },
+                { text: "Highlighted_Green2", property: "highlightColor", expected: ["#00FF00", "green"] },
+                { text: "Highlight_Cyan2", property: "highlightColor", expected: ["cyan", "#00FFFF"] },
+                { text: "Highlight_Yellow2", property: "highlightColor", expected: ["yellow", "#FFFF00"] },
+                { text: "Font_Size_18", property: "size", expected: 18 },
+                { text: "Font_Size_20", property: "size", expected: 20 },
+                { text: "Font_Size_26", property: "size", expected: 26 },
+                { text: "Font_Size_35", property: "size", expected: 35 }
             ];
 
             let results = [];
