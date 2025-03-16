@@ -27,7 +27,12 @@ async function checkFormatting() {
                 { text: "Font Size: 14", property: "size", expected: 14 },
                 { text: "Font Size: 16", property: "size", expected: 16 },
                 { text: "Font Size: 19", property: "size", expected: 19 },
-                { text: "Font Size: 24", property: "size", expected: 24 }
+                { text: "Font Size: 24", property: "size", expected: 24 },
+
+                { text: "Round 2", property: "none", expected: "none" }
+                { text: "Bold2", property: "bold", expected: true },
+
+
             ];
 
             let results = [];
