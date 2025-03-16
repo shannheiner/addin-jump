@@ -24,13 +24,33 @@ async function checkFormatting() {
                 { text: "Highlighted_Green", property: "highlightColor", expected: ["#00FF00", "green"] },
                 { text: "Highlight_Cyan", property: "highlightColor", expected: ["cyan", "#00FFFF"] },
                 { text: "Highlight_Yellow", property: "highlightColor", expected: ["yellow", "#FFFF00"] },
-                { text: "Font Size: 14", property: "size", expected: 14 },
-                { text: "Font Size: 16", property: "size", expected: 16 },
-                { text: "Font Size: 19", property: "size", expected: 19 },
-                { text: "Font Size: 24", property: "size", expected: 24 },
+                { text: "Font_Size_14", property: "size", expected: 14 },
+                { text: "Font_Size_16", property: "size", expected: 16 },
+                { text: "Font_Size_19", property: "size", expected: 19 },
+                { text: "Font_Size_24", property: "size", expected: 24 },
 
                 { text: "Round 2", property: "none", expected: "none" },
-                { text: "Bold2", property: "bold", expected: true }
+                { text: "Bold2", property: "bold", expected: true },
+                { text: "Italic2", property: "italic", expected: true },
+                { text: "Underline2", property: "underline", expected: "exists" },
+                { text: "Subscript2", property: "subscript", expected: true },
+                { text: "Superscript2", property: "superscript", expected: true },
+                { text: "Strikethrough2", property: "strikeThrough", expected: true },
+
+                { text: "Font_Type_Verdana Pro", property: "name", expected: "Verdana Pro" },
+                { text: "Font_Type_Cooper Black", property: "name", expected: "Cooper Black" },
+                { text: "Font_Type_Cabira Black", property: "name", expected: "Cabira Black" },
+                { text: "Font_Type_Georgia Pro", property: "name", expected: "Georgia Pro" },
+                { text: "Font_Color_Blue", property: "color", expected: ["#0000FF", "blue"] },
+                { text: "Font_Color_Orange", property: "color", expected: ["#FFA500", "orange"] },
+                { text: "Font_Color_Pink", property: "color", expected: ["#FFC0CB", "pink"] },
+                { text: "Highlighted_Blue", property: "highlightColor", expected: ["#0000FF", "blue"] },
+                { text: "Highlight_Magenta", property: "highlightColor", expected: ["magenta", "#FF00FF"] },
+                { text: "Highlight_Red", property: "highlightColor", expected: ["red", "#FF0000"] },
+                { text: "Font_Size_10", property: "size", expected: 10 },
+                { text: "Font_Size_15", property: "size", expected: 15 },
+                { text: "Font_Size_36", property: "size", expected: 36 },
+                { text: "Font_Size_46", property: "size", expected: 46 }
 
 
             ];
