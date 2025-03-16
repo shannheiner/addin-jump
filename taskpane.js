@@ -29,8 +29,8 @@ async function checkFormatting() {
                 { text: "Font Size: 19", property: "size", expected: 19 },
                 { text: "Font Size: 24", property: "size", expected: 24 },
 
-                { text: "Round 2", property: "none", expected: "none" }
-                { text: "Bold2", property: "bold", expected: true },
+                { text: "Round 2", property: "none", expected: "none" },
+                { text: "Bold2", property: "bold", expected: true }
 
 
             ];
