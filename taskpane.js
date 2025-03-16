@@ -13,7 +13,7 @@ async function checkFormatting() {
                 { text: "Underline1", property: "underline", expected: "exists" },
                 { text: "Subscript1", property: "subscript", expected: true },
                 { text: "Superscript1", property: "superscript", expected: true },
-                { text: "Strikethrough1", property: "strikeThrough", expected: true }, // Updated property name
+                { text: "Strikethrough1", property: "strikeThrough", expected: true },
                 { text: "Font_Type_Calibri", property: "name", expected: "Calibri" },
                 { text: "Font_Type_Times New Roman", property: "name", expected: "Times New Roman" },
                 { text: "Font_Type_Comic Sans MS", property: "name", expected: "Comic Sans MS" },
@@ -24,31 +24,10 @@ async function checkFormatting() {
                 { text: "Highlighted_Green", property: "highlightColor", expected: ["#00FF00", "green"] },
                 { text: "Highlight_Cyan", property: "highlightColor", expected: ["cyan", "#00FFFF"] },
                 { text: "Highlight_Yellow", property: "highlightColor", expected: ["yellow", "#FFFF00"] },
-                { text: "Font_Size_14", property: "size", expected: 14 },
-                { text: "Font_Size_16", property: "size", expected: 16 },
-                { text: "Font_Size_19", property: "size", expected: 19 },
-                { text: "Font_Size_24", property: "size", expected: 24 },
-
-                { text: "Bold2", property: "bold", expected: true },
-                { text: "Italic2", property: "italic", expected: true },
-                { text: "Underline2", property: "underline", expected: "exists" },
-                { text: "Subscript2", property: "subscript", expected: true },
-                { text: "Superscript2", property: "superscript", expected: true },
-                { text: "Strikethrough2", property: "strikeThrough", expected: true }, // Updated property name
-                { text: "Font_Type_Verdana Pro", property: "name", expected: "Verdana Pro" },
-                { text: "Font_Type_Cooper Black", property: "name", expected: "Cooper Black" },
-                { text: "Font_Type_Comic Sans MS", property: "name", expected: "Comic Sans MS" },
-                { text: "Font_Type_Consolas2", property: "name", expected: "Consolas" },
-                { text: "Font_Color_Red2", property: "color", expected: ["#FF0000", "red"] },
-                { text: "Font_Color_Dark_Green2", property: "color", expected: ["#008000", "green"] },
-                { text: "Font_Color_Purple2", property: "color", expected: ["#800080", "purple"] },
-                { text: "Highlighted_Green2", property: "highlightColor", expected: ["#00FF00", "green"] },
-                { text: "Highlight_Cyan2", property: "highlightColor", expected: ["cyan", "#00FFFF"] },
-                { text: "Highlight_Yellow2", property: "highlightColor", expected: ["yellow", "#FFFF00"] },
-                { text: "Font_Size_18", property: "size", expected: 18 },
-                { text: "Font_Size_20", property: "size", expected: 20 },
-                { text: "Font_Size_26", property: "size", expected: 26 },
-                { text: "Font_Size_35", property: "size", expected: 35 }
+                { text: "Font Size: 14", property: "size", expected: 14 },
+                { text: "Font Size: 16", property: "size", expected: 16 },
+                { text: "Font Size: 19", property: "size", expected: 19 },
+                { text: "Font Size: 24", property: "size", expected: 24 }
             ];
 
             let results = [];
@@ -92,19 +71,13 @@ async function checkFormatting() {
                     }
                 }
 
-                if (!isFound) {
-                    results.push(`<p style="background-color: lightyellow;">${check.text}: Not Found</p>`);
-                } else {
-                    results.push(`<p style="background-color: ${isCorrect ? 'lightgreen' : 'lightcoral'};">${check.text}: ${isCorrect ? "Correct" : "Incorrect"}</p>`);
-                }
+                if (isCorrect) correctCount++;
 
-               // if (isCorrect) correctCount++;
-
-               // results.push(
-                //    `<p style="background-color: ${isCorrect ? 'lightgreen' : 'lightcoral'};">
-                //        ${check.text}: ${isCorrect ? "Correct" : "Incorrect"}
-                 //   </p>`
-                //);
+                results.push(
+                    `<p style="background-color: ${isFound ? (isCorrect ? 'lightgreen' : 'lightcoral') : 'lightyellow'};">
+                        ${check.text}: ${isFound ? (isCorrect ? "Correct" : "Incorrect") : "Not Found"}
+                    </p>`
+                );
             }
 
             let scorePercentage = ((correctCount / totalCount) * 100).toFixed(2);
