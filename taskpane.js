@@ -92,13 +92,19 @@ async function checkFormatting() {
                     }
                 }
 
-                if (isCorrect) correctCount++;
+                if (!isFound) {
+                    results.push(`<p style="background-color: lightyellow;">${check.text}: Not Found</p>`);
+                } else {
+                    results.push(`<p style="background-color: ${isCorrect ? 'lightgreen' : 'lightcoral'};">${check.text}: ${isCorrect ? "Correct" : "Incorrect"}</p>`);
+                }
 
-                results.push(
-                    `<p style="background-color: ${isCorrect ? 'lightgreen' : 'lightcoral'};">
-                        ${check.text}: ${isCorrect ? "Correct" : "Incorrect"}
-                    </p>`
-                );
+               // if (isCorrect) correctCount++;
+
+               // results.push(
+                //    `<p style="background-color: ${isCorrect ? 'lightgreen' : 'lightcoral'};">
+                //        ${check.text}: ${isCorrect ? "Correct" : "Incorrect"}
+                 //   </p>`
+                //);
             }
 
             let scorePercentage = ((correctCount / totalCount) * 100).toFixed(2);
