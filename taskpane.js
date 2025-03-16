@@ -41,8 +41,8 @@ async function checkFormatting() {
                 { text: "Font_Type_Cooper Black", property: "name", expected: "Cooper Black" },
                 { text: "Font_Type_Cabira Black", property: "name", expected: "Cabira Black" },
                 { text: "Font_Type_Georgia Pro", property: "name", expected: "Georgia Pro" },
-                { text: "Font_Color_Blue", property: "color", expected: ["#0000FF", "blue"] },
-                { text: "Font_Color_Orange", property: "color", expected: ["#FFA500", "orange"] },
+                { text: "Font_Color_Blue", property: "color", expected: ["#0070C0", "blue"] },
+                { text: "Font_Color_Orange", property: "color", expected: ["#FFC000", "orange"] },
                 { text: "Font_Color_Pink", property: "color", expected: ["#FFC0CB", "pink"] },
                 { text: "Highlighted_Blue", property: "highlightColor", expected: ["#0000FF", "blue"] },
                 { text: "Highlight_Magenta", property: "highlightColor", expected: ["magenta", "#FF00FF"] },
@@ -80,10 +80,18 @@ async function checkFormatting() {
                                 break;
                             }
                             if ((check.text.includes("Green") && isGreenColor(fontProperty)) || 
-                                (check.text.includes("Purple") && isPurpleColor(fontProperty))) {
-                                isCorrect = true;
-                                break;
-                            }
+                            (check.text.includes("Purple") && isPurpleColor(fontProperty)) ||
+                            (check.text.includes("Pink") && isPinkColor(fontProperty)) ) {
+                            isCorrect = true;
+                            break;
+                             }
+                          
+                          
+                          //  if ((check.text.includes("Green") && isGreenColor(fontProperty)) || 
+                          //      (check.text.includes("Purple") && isPurpleColor(fontProperty))) {
+                          //      isCorrect = true;
+                          //      break;
+                          //  }
                         } 
                         else if (check.property === "underline" && fontProperty !== "None") {
                             isCorrect = true;
@@ -134,6 +142,19 @@ function isPurpleColor(color) {
         let g = parseInt(color.substring(3, 5), 16);
         let b = parseInt(color.substring(5, 7), 16);
         return r > 60 && b > 60 && g < 80;
+    }
+    return false;
+}
+
+// Function to check if a color is a shade of pink
+function isPinkColor(color) {
+    if (color.startsWith("#") && color.length === 7) {
+        let r = parseInt(color.substring(1, 3), 16);
+        let g = parseInt(color.substring(3, 5), 16);
+        let b = parseInt(color.substring(5, 7), 16);
+        
+        // A shade of pink generally has high red, medium blue, and low green
+        return r > 200 && b > 150 && g < 150;
     }
     return false;
 }
