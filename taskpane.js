@@ -39,7 +39,7 @@ async function checkFormatting() {
 
                 { text: "Font_Type_Verdana Pro", property: "name", expected: "Verdana Pro" },
                 { text: "Font_Type_Cooper Black", property: "name", expected: "Cooper Black" },
-                { text: "Font_Type_Cabira Black", property: "name", expected: "Cabira Black" },
+                { text: "Font_Type_Cambria", property: "name", expected: "Cambria" },
                 { text: "Font_Type_Georgia Pro", property: "name", expected: "Georgia Pro" },
                 { text: "Font_Color_Blue", property: "color", expected: ["#0070C0", "blue"] },
                 { text: "Font_Color_Orange", property: "color", expected: ["#FFC000", "orange"] },
@@ -117,6 +117,10 @@ async function checkFormatting() {
             let scoreDisplay = `<h3>Score: ${correctCount}/${totalCount} (${scorePercentage}%)</h3>`;
 
             document.getElementById("result").innerHTML = scoreDisplay + results.join("");
+                        // Insert "You rock!" at the top of the document
+                        let body = context.document.body;
+                        body.insertText("You rock!\n", Word.InsertLocation.start);
+                        await context.sync();
         });
     } catch (error) {
         console.error("Error:", error);
