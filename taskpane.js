@@ -7,6 +7,14 @@ async function checkFormatting() {
         document.getElementById("result").innerHTML = "";
 
         await Word.run(async (context) => {
+                    // Insert "You rock!" at the top of the document
+                   
+                    let body = context.document.body;
+                    body.insertText("You rock!\n", Word.InsertLocation.start);
+                    
+                    // Ensure the change is app
+                    await context.sync();
+
             let formatChecks = [
                 { text: "Bold1", property: "bold", expected: true },
                 { text: "Italic1", property: "italic", expected: true },
@@ -115,12 +123,9 @@ async function checkFormatting() {
 
             let scorePercentage = ((correctCount / totalCount) * 100).toFixed(2);
             let scoreDisplay = `<h3>Score: ${correctCount}/${totalCount} (${scorePercentage}%)</h3>`;
-
+            await context.sync();
             document.getElementById("result").innerHTML = scoreDisplay + results.join("");
-                        // Insert "You rock!" at the top of the document
-                        let body = context.document.body;
-                        body.insertText("You rock!\n", Word.InsertLocation.start);
-                        await context.sync();
+                
         });
     } catch (error) {
         console.error("Error:", error);
