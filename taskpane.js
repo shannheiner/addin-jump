@@ -7,13 +7,7 @@ async function checkFormatting() {
         document.getElementById("result").innerHTML = "";
 
         await Word.run(async (context) => {
-                    // Insert "You rock!" at the top of the document
-                   
-                    let body = context.document.body;
-                    body.insertText("You rock!\n", Word.InsertLocation.start);
-                    
-                    // Ensure the change is app
-                    await context.sync();
+          
 
             let formatChecks = [
                 { text: "Bold1", property: "bold", expected: true },
