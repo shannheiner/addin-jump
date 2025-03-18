@@ -7,8 +7,6 @@ async function checkFormatting() {
         document.getElementById("result").innerHTML = "";
 
         await Word.run(async (context) => {
-          
-
             let formatChecks = [
                 { text: "Bold1", property: "bold", expected: true },
                 { text: "Italic1", property: "italic", expected: true },
@@ -29,32 +27,7 @@ async function checkFormatting() {
                 { text: "Font_Size_14", property: "size", expected: 14 },
                 { text: "Font_Size_16", property: "size", expected: 16 },
                 { text: "Font_Size_19", property: "size", expected: 19 },
-                { text: "Font_Size_24", property: "size", expected: 24 },
-
-                { text: "Round 2", property: "none", expected: "none" },
-                { text: "Bold2", property: "bold", expected: true },
-                { text: "Italic2", property: "italic", expected: true },
-                { text: "Underline2", property: "underline", expected: "exists" },
-                { text: "Subscript2", property: "subscript", expected: true },
-                { text: "Superscript2", property: "superscript", expected: true },
-                { text: "Strikethrough2", property: "strikeThrough", expected: true },
-
-                { text: "Font_Type_Verdana Pro", property: "name", expected: "Verdana Pro" },
-                { text: "Font_Type_Cooper Black", property: "name", expected: "Cooper Black" },
-                { text: "Font_Type_Cambria", property: "name", expected: "Cambria" },
-                { text: "Font_Type_Georgia Pro", property: "name", expected: "Georgia Pro" },
-                { text: "Font_Color_Blue", property: "color", expected: ["#0070C0", "blue"] },
-                { text: "Font_Color_Orange", property: "color", expected: ["#FFC000", "orange"] },
-                { text: "Font_Color_Pink", property: "color", expected: ["#FFC0CB", "pink"] },
-                { text: "Highlighted_Blue", property: "highlightColor", expected: ["#0000FF", "blue"] },
-                { text: "Highlight_Magenta", property: "highlightColor", expected: ["magenta", "#FF00FF"] },
-                { text: "Highlight_Red", property: "highlightColor", expected: ["red", "#FF0000"] },
-                { text: "Font_Size_10", property: "size", expected: 10 },
-                { text: "Font_Size_15", property: "size", expected: 15 },
-                { text: "Font_Size_36", property: "size", expected: 36 },
-                { text: "Font_Size_46", property: "size", expected: 46 }
-
-
+                { text: "Font_Size_24", property: "size", expected: 24 }
             ];
 
             let results = [];
@@ -82,23 +55,19 @@ async function checkFormatting() {
                                 break;
                             }
                             if ((check.text.includes("Green") && isGreenColor(fontProperty)) || 
-                            (check.text.includes("Purple") && isPurpleColor(fontProperty)) ||
-                            (check.text.includes("Pink") && isPinkColor(fontProperty)) ) {
-                            isCorrect = true;
-                            break;
-                             }
-                          
-                          
-                          //  if ((check.text.includes("Green") && isGreenColor(fontProperty)) || 
-                          //      (check.text.includes("Purple") && isPurpleColor(fontProperty))) {
-                          //      isCorrect = true;
-                          //      break;
-                          //  }
+                                (check.text.includes("Purple") && isPurpleColor(fontProperty))) {
+                                isCorrect = true;
+                                break;
+                            }
                         } 
-                        else if (check.property === "underline" && fontProperty !== "None") {
+                        else if (check.property === "underline" && fontProperty && fontProperty !== "None") {
                             isCorrect = true;
                             break;
                         } 
+                        else if (check.property === "strikeThrough" && (fontProperty === true || fontProperty === "single")) {
+                            isCorrect = true;
+                            break;
+                        }
                         else if (fontProperty === check.expected) {
                             isCorrect = true;
                             break;
@@ -108,18 +77,17 @@ async function checkFormatting() {
 
                 if (isCorrect) correctCount++;
 
-                results.push(
-                    `<p style="background-color: ${isFound ? (isCorrect ? 'lightgreen' : 'lightcoral') : 'lightyellow'};">
-                        ${check.text}: ${isFound ? (isCorrect ? "Correct" : "Incorrect") : "Not Found"}
-                    </p>`
-                );
+                if (!isFound) {
+                    results.push(`<p style="background-color: lightyellow;">${check.text}: Not Found</p>`);
+                } else {
+                    results.push(`<p style="background-color: ${isCorrect ? 'lightgreen' : 'lightcoral'};">${check.text}: ${isCorrect ? "Correct" : "Incorrect"}</p>`);
+                }
             }
 
             let scorePercentage = ((correctCount / totalCount) * 100).toFixed(2);
             let scoreDisplay = `<h3>Score: ${correctCount}/${totalCount} (${scorePercentage}%)</h3>`;
-            await context.sync();
+
             document.getElementById("result").innerHTML = scoreDisplay + results.join("");
-                
         });
     } catch (error) {
         console.error("Error:", error);
@@ -129,6 +97,7 @@ async function checkFormatting() {
 
 // Function to check if a color is a shade of green
 function isGreenColor(color) {
+    if (color === "green") return true;
     if (color.startsWith("#") && color.length === 7) {
         let r = parseInt(color.substring(1, 3), 16);
         let g = parseInt(color.substring(3, 5), 16);
@@ -140,24 +109,12 @@ function isGreenColor(color) {
 
 // Function to check if a color is a shade of purple
 function isPurpleColor(color) {
+    if (color === "purple") return true;
     if (color.startsWith("#") && color.length === 7) {
         let r = parseInt(color.substring(1, 3), 16);
         let g = parseInt(color.substring(3, 5), 16);
         let b = parseInt(color.substring(5, 7), 16);
         return r > 60 && b > 60 && g < 80;
-    }
-    return false;
-}
-
-// Function to check if a color is a shade of pink
-function isPinkColor(color) {
-    if (color.startsWith("#") && color.length === 7) {
-        let r = parseInt(color.substring(1, 3), 16);
-        let g = parseInt(color.substring(3, 5), 16);
-        let b = parseInt(color.substring(5, 7), 16);
-        
-        // A shade of pink generally has high red, medium blue, and low green
-        return r > 200 && b > 150 && g < 150;
     }
     return false;
 }
