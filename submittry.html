@@ -1,66 +1,62 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Send Score to Wix</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Score</title>
 </head>
 <body>
-    <h1>Send Score to Wix</h1>
-
-    <label for="studentID">Student ID:</label>
-    <input type="number" id="studentID" value="12"><br><br>
-
-    <label for="score">Score:</label>
-    <input type="number" id="score" value="89"><br><br>
-
-    <button onclick="sendScoreToWix()">Send Score</button>
+    <h1>Submit Score</h1>
+    <form id="scoreForm">
+        <label for="studentID">Student ID:</label>
+        <input type="number" id="studentID" name="studentID" required>
+        <br><br>
+        <label for="score">Score:</label>
+        <input type="number" id="score" name="score" required>
+        <br><br>
+        <button type="submit">Submit</button>
+    </form>
+    <p id="result"></p>
 
     <script>
-        async function sendScoreToWix() {
-            let studentID = document.getElementById("studentID").value;
-            let score = document.getElementById("score").value;
-            let wixURL = "https://sheiner5.wixsite.com/my-site/_functions/submitScore";
+        document.getElementById("scoreForm").addEventListener("submit", async function(event) {
+            event.preventDefault(); // Prevent form from refreshing page
 
-            let jsonPayload = {
-                studentID: parseInt(studentID), // Parse to integer
-                score: parseInt(score), // Parse to integer
+            const studentID = document.getElementById("studentID").value;
+            const score = document.getElementById("score").value;
+
+            const url = "https://sheiner5.wixsite.com/my-site/_functions/submitScore";
+
+            const jsonPayload = {
+                studentID: Number(studentID),
+                score: Number(score)
             };
 
-            console.log("JSON Payload:", JSON.stringify(jsonPayload));
-
             try {
-                let response = await fetch(wixURL, {
+                let response = await fetch(url, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                     },
                     body: JSON.stringify(jsonPayload),
+                    credentials: "omit"  // Prevent Wix from removing CORS headers
                 });
 
+                // Check if response is valid
                 if (!response.ok) {
-                    let errorText = await response.text();
-                    throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+                    throw new Error(`Server responded with status: ${response.status}`);
                 }
 
                 let responseData = await response.json();
+                document.getElementById("result").textContent = responseData.success 
+                    ? "Score submitted successfully!" 
+                    : `Error: ${responseData.message}`;
 
-                console.log("Server Response:", responseData);
-
-                alert("Response: " + JSON.stringify(responseData));
-
-                if (responseData.success) {
-                    alert(
-                        "Student ID " + studentID + " found and updated successfully!"
-                    );
-                } else {
-                    alert(
-                        "Failed to update Student ID " + studentID + ". Check server response."
-                    );
-                }
             } catch (error) {
-                alert("Error: " + error.message);
-                console.error("Error:", error);
+                console.error("Error submitting score:", error);
+                document.getElementById("result").textContent = "Failed to submit score. Check console for details.";
             }
-        }
+        });
     </script>
 </body>
 </html>
