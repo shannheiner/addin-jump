@@ -16,7 +16,7 @@ async function checkFormatting() {
     // Ensure the button exists before adding an event listener
         if (myButton) {
             myButton.addEventListener("click", function() {
-                document.getElementById("result").innerText = "Button clicked!";
+                document.getElementById("show_submit_div").innerText = "Button clicked!";
             });
         } else {
             console.error("Button with ID 'myButton' not found. Check your HTML.");

@@ -13,10 +13,9 @@ button {
     padding: 10px;
     margin-top: 10px;
 }
-#myButton{
-    display:block;
-}
+
 
 .hidden {
-    display: none;
+    display:none;
+    
 }
