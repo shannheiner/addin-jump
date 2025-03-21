@@ -5,22 +5,26 @@ Office.onReady(function (info) {
 async function checkFormatting() {
         
     document.getElementById("myButton").classList.remove("hidden");
-    // let myButton = document.getElementById("myButton");
-    // if (myButton) {
-    //     myButton.display = "block"; // Make button visible
-    //     myButton.disabled = false; // Enable the button
-    // } else {
-    //     console.error("Button with ID 'myButton' not found.");
-    // }
 
-    // Ensure the button exists before adding an event listener
-        if (myButton) {
-            myButton.addEventListener("click", function() {
-                document.getElementById("show_submit_div").innerText = "Button clicked!";
-            });
-        } else {
-            console.error("Button with ID 'myButton' not found. Check your HTML.");
-        }
+
+    // This is the Submit Score button
+        // if (myButton) {
+        //     myButton.addEventListener("click", function() {
+        //         document.getElementById("show_submit_div").innerText = "Button clicked!";
+        //     });
+        // } else {
+        //     console.error("Button with ID 'myButton' not found. Check your HTML.");
+        // }
+
+ // This is the Submit Score button
+    if (myButton) {
+        // Pass the function reference, not the result of calling the function
+        myButton.addEventListener("click", submit_score_function);
+    } else {
+        console.error("Button with ID 'myButton' not found. Check your HTML.");
+    }
+
+  
 
    
     try {
@@ -180,4 +184,10 @@ function isPinkColor(color) {
         return r > 200 && b > 150 && g < 150;
     }
     return false;
+}
+
+
+  // Define the submit_score_function
+  function submit_score_function() {
+    document.getElementById("show_submit_div").innerText = "Button clicked!";
 }
