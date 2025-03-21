@@ -189,5 +189,5 @@ function isPinkColor(color) {
 
   // Define the submit_score_function
   function submit_score_function() {
-    document.getElementById("show_submit_div").innerText = "Button clicked!";
+    document.getElementById("show_submit_div").innerText = "Button clicked - running the function!";
 }
