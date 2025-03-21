@@ -3,6 +3,26 @@ Office.onReady(function (info) {
 });
 
 async function checkFormatting() {
+        
+    document.getElementById("myButton").classList.remove("hidden");
+    // let myButton = document.getElementById("myButton");
+    // if (myButton) {
+    //     myButton.display = "block"; // Make button visible
+    //     myButton.disabled = false; // Enable the button
+    // } else {
+    //     console.error("Button with ID 'myButton' not found.");
+    // }
+
+    // Ensure the button exists before adding an event listener
+        if (myButton) {
+            myButton.addEventListener("click", function() {
+                alert("Button clicked! This is a test popup.");
+            });
+        } else {
+            console.error("Button with ID 'myButton' not found. Check your HTML.");
+        }
+
+   
     try {
         document.getElementById("result").innerHTML = "";
 
@@ -31,7 +51,7 @@ async function checkFormatting() {
                 { text: "Font_Size_19", property: "size", expected: 19 },
                 { text: "Font_Size_24", property: "size", expected: 24 },
 
-                { text: "Round 2", property: "none", expected: "none" },
+               // { text: "Round 2", property: "none", expected: "none" },
                 { text: "Bold2", property: "bold", expected: true },
                 { text: "Italic2", property: "italic", expected: true },
                 { text: "Underline2", property: "underline", expected: "exists" },
