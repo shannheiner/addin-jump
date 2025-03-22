@@ -2,21 +2,22 @@ Office.onReady(function(info) {
     // Supabase configuration
     const supabaseUrl = 'https://yrcsoolflpgwackcljjs.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlyY3Nvb2xmbHBnd2Fja2NsampzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI0MzcyNDUsImV4cCI6MjA1ODAxMzI0NX0.aa1AwaVmHQ2CElMFJK10dSvWf3GFKkJ7ePeEcyItUZQ';
-    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+    const { createClient } = supabase; // Import createClient from supabase library
+    const supabaseClient = createClient(supabaseUrl, supabaseKey);
 
     const loginButton = document.getElementById("login-button");
     if(loginButton){
         loginButton.addEventListener("click", function(event) {
             event.preventDefault(); // Prevent default form submission
-            handleLogin();
+            handleLogin(supabaseClient); // Pass the supabase client
         });
     }
 
     // Check if user is already logged in
-    checkExistingSession(supabase); // Pass the supabase client
+    checkExistingSession(supabaseClient); // Pass the supabase client
 });
 
-async function handleLogin() {
+async function handleLogin(supabase) { // Receive the supabase client
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
     const messageElement = document.getElementById("login-message");
@@ -69,7 +70,7 @@ async function handleLogin() {
     }
 }
 
-function checkExistingSession(supabase) {
+function checkExistingSession(supabase) { // Receive the supabase client
     try {
         // Check if we have a saved session
         const userSession = Office.context.document.settings.get("userSession");
