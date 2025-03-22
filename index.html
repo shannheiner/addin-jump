@@ -4,16 +4,27 @@
     <meta charset="UTF-8">
     <title>Format Checker</title>
     <script src="https://appsforoffice.microsoft.com/lib/1/hosted/Office.js" type="text/javascript"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="taskpane.css">
 </head>
 <body>
-    <h1>Main Assignments Page</h1>
-    
-    <div>
-        <a href="formatting_assignment.html">Formatting Assignment</a>
-        <a href="test_update_a_studentscore.html">Submit Try</a>
+    <div id="app-container">
+        <div id="loading">Loading...</div>
         
+        <div id="main-content" style="display: none;">
+            <div id="user-info">
+                <span id="username">Student</span>
+                <button id="logout-button">Logout</button>
+            </div>
+            
+            <h1>Main Assignments Page</h1>
+            
+            <div>
+                <a href="formatting_assignment.html">Formatting Assignment</a>
+            </div>
+        </div>
     </div>
     
+    <script src="index.js"></script>
 </body>
 </html>

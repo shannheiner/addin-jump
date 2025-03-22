@@ -6,7 +6,10 @@ body {
 button {
     padding: 10px 20px;
     margin-bottom: 10px;
+    background-color: blueviolet;
+    border-radius: 20px;
 }
+
 
 #result {
     border: 1px solid #ccc;
