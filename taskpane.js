@@ -6,7 +6,6 @@ async function checkFormatting() {
         
     document.getElementById("myButton").classList.remove("hidden");
 
-
     // This is the Submit Score button
         // if (myButton) {
         //     myButton.addEventListener("click", function() {
@@ -77,7 +76,6 @@ async function checkFormatting() {
                 { text: "Font_Size_15", property: "size", expected: 15 },
                 { text: "Font_Size_36", property: "size", expected: 36 },
                 { text: "Font_Size_46", property: "size", expected: 46 }
-
 
             ];
 
@@ -186,79 +184,91 @@ function isPinkColor(color) {
     return false;
 }
 
-
-  // Define the submit_score_function
-  function submit_score_function() {
-
-    document.getElementById("show_submit_div").innerText = "Button clicked - running the function!";
+// Define the submit_score_function with Supabase integration
+async function submit_score_function() {
+    document.getElementById("show_submit_div").innerText = "Submitting score to database...";
     
-    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
-
+    // Import the Supabase client from CDN
+    const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm');
+    
+    // Set up Supabase client
     const supabaseUrl = 'https://yrcsoolflpgwackcljjs.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlyY3Nvb2xmbHBnd2Fja2NsampzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI0MzcyNDUsImV4cCI6MjA1ODAxMzI0NX0.aa1AwaVmHQ2CElMFJK10dSvWf3GFKkJ7ePeEcyItUZQ'; // Use your ANON key here, Service key is for backend only.
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlyY3Nvb2xmbHBnd2Fja2NsampzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI0MzcyNDUsImV4cCI6MjA1ODAxMzI0NX0.aa1AwaVmHQ2CElMFJK10dSvWf3GFKkJ7ePeEcyItUZQ';
     const supabase = createClient(supabaseUrl, supabaseKey);
-
-    async function updateStudentScore(studentName, assignmentName, newScore) {
-        try {
-            // 1. Find the student ID
-            const { data: studentData, error: studentError } = await supabase
-                .from('students')
-                .select('student_id')
-                .eq('student_name', studentName);
-
-            if (studentError || studentData.length === 0) {
-                console.error("Error finding student:", studentError);
-                alert("Error finding student. Check console.");
-                return;
-            }
-
-            const studentId = studentData[0].student_id;
-
-            // 2. Find the assignment record ID
-            const { data: assignmentData, error: assignmentError } = await supabase
-                .from('assignments')
-                .select('id')
-                .eq('student_id', studentId)
-                .eq('assignment_name', assignmentName);
-
-            if (assignmentError || assignmentData.length === 0) {
-                console.error("Error finding assignment:", assignmentError);
-                alert("Error finding assignment. Check console.");
-                console.log("Student ID:", studentId);
-                return;
-            }
-
-            const assignmentId = assignmentData[0].id;
-
-            // 3. Update the score
-            const { error: updateError } = await supabase
-                .from('assignments')
-                .update({ score: newScore })
-                .eq('id', assignmentId);
-                console.log("Student ID:", studentId);
-
-            if (updateError) {
-                console.error("Error updating score:", updateError);
-                alert("Error updating score. Check console.");
-                return;
-                console.log("Student ID:", studentId);
-            }
-
-            alert("Score updated successfully!");
-        } catch (error) {
-            console.error("Unexpected error:", error);
-            alert("Unexpected error. Check console.");
-            console.log("Student ID:", studentId);
+    
+    try {
+        // Get the score from the results
+        const scoreElement = document.querySelector("#result h3");
+        if (!scoreElement) {
+            document.getElementById("show_submit_div").innerText = "Error: Score not found. Please check formatting first.";
+            return;
         }
+        
+        // Extract the score from the scoreElement text (format: "Score: X/Y (Z%)")
+        const scoreText = scoreElement.textContent;
+        const scoreMatch = scoreText.match(/Score: (\d+)\/(\d+) \(([0-9.]+)%\)/);
+        
+        if (!scoreMatch) {
+            document.getElementById("show_submit_div").innerText = "Error: Could not parse score.";
+            return;
+        }
+        
+        const correct = parseInt(scoreMatch[1]);
+        const total = parseInt(scoreMatch[2]);
+        const percentage = parseFloat(scoreMatch[3]);
+        
+        // Use predefined student and assignment for simplicity 
+        // (in a real app, you might want to get these from a form or other source)
+        const studentName = "Test Student 1"; // Default student name
+        const assignmentName = "test_assignment"; // Default assignment name
+        
+        // 1. Find the student ID
+        const { data: studentData, error: studentError } = await supabase
+            .from('students')
+            .select('student_id')
+            .eq('student_name', studentName);
+
+        if (studentError || studentData.length === 0) {
+            console.error("Error finding student:", studentError);
+            document.getElementById("show_submit_div").innerText = "Error finding student. Check console.";
+            return;
+        }
+
+        const studentId = studentData[0].student_id;
+
+        // 2. Find the assignment record ID
+        const { data: assignmentData, error: assignmentError } = await supabase
+            .from('assignments')
+            .select('id')
+            .eq('student_id', studentId)
+            .eq('assignment_name', assignmentName);
+
+        if (assignmentError || assignmentData.length === 0) {
+            console.error("Error finding assignment:", assignmentError);
+            document.getElementById("show_submit_div").innerText = "Error finding assignment. Check console.";
+            console.log("Student ID:", studentId);
+            return;
+        }
+
+        const assignmentId = assignmentData[0].id;
+
+        // 3. Update the score
+        const { error: updateError } = await supabase
+            .from('assignments')
+            .update({ score: percentage }) // Using percentage as the score
+            .eq('id', assignmentId);
+
+        if (updateError) {
+            console.error("Error updating score:", updateError);
+            document.getElementById("show_submit_div").innerText = "Error updating score. Check console.";
+            return;
+        }
+
+        document.getElementById("show_submit_div").innerText = "Score submitted successfully! " + 
+            `${correct}/${total} (${percentage}%) for ${studentName}, assignment: ${assignmentName}`;
+            
+    } catch (error) {
+        console.error("Unexpected error:", error);
+        document.getElementById("show_submit_div").innerText = "Unexpected error. Check console.";
     }
-
-    document.getElementById('updateScoreButton').addEventListener('click', async () => {
-        const studentName = document.getElementById('studentName').value;
-        const assignmentName = document.getElementById('assignmentName').value;
-        const newScore = parseInt(document.getElementById('newScore').value);
-
-        await updateStudentScore(studentName, assignmentName, newScore);
-    });
-
-
 }
