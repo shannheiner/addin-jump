@@ -1,22 +1,37 @@
 Office.onReady(function (info) {
     document.getElementById("checkFormat").addEventListener("click", checkFormatting);
-    
-    // Add listener to the submit button
-    const myButton = document.getElementById("myButton");
+});
+
+async function checkFormatting() {
+        
+    document.getElementById("myButton").classList.remove("hidden");
+
+    // This is the Submit Score button
+        // if (myButton) {
+        //     myButton.addEventListener("click", function() {
+        //         document.getElementById("show_submit_div").innerText = "Button clicked!";
+        //     });
+        // } else {
+        //     console.error("Button with ID 'myButton' not found. Check your HTML.");
+        // }
+
+ // This is the Submit Score button
     if (myButton) {
+        // Pass the function reference, not the result of calling the function
         myButton.addEventListener("click", submit_score_function);
     } else {
         console.error("Button with ID 'myButton' not found. Check your HTML.");
     }
-});
 
-async function checkFormatting() {
-    document.getElementById("myButton").classList.remove("hidden");
+  
 
+   
     try {
         document.getElementById("result").innerHTML = "";
 
         await Word.run(async (context) => {
+          
+
             let formatChecks = [
                 { text: "Bold1", property: "bold", expected: true },
                 { text: "Italic1", property: "italic", expected: true },
@@ -39,6 +54,7 @@ async function checkFormatting() {
                 { text: "Font_Size_19", property: "size", expected: 19 },
                 { text: "Font_Size_24", property: "size", expected: 24 },
 
+               // { text: "Round 2", property: "none", expected: "none" },
                 { text: "Bold2", property: "bold", expected: true },
                 { text: "Italic2", property: "italic", expected: true },
                 { text: "Underline2", property: "underline", expected: "exists" },
@@ -60,6 +76,7 @@ async function checkFormatting() {
                 { text: "Font_Size_15", property: "size", expected: 15 },
                 { text: "Font_Size_36", property: "size", expected: 36 },
                 { text: "Font_Size_46", property: "size", expected: 46 }
+
             ];
 
             let results = [];
@@ -89,9 +106,16 @@ async function checkFormatting() {
                             if ((check.text.includes("Green") && isGreenColor(fontProperty)) || 
                             (check.text.includes("Purple") && isPurpleColor(fontProperty)) ||
                             (check.text.includes("Pink") && isPinkColor(fontProperty)) ) {
-                                isCorrect = true;
-                                break;
-                            }
+                            isCorrect = true;
+                            break;
+                             }
+                          
+                          
+                          //  if ((check.text.includes("Green") && isGreenColor(fontProperty)) || 
+                          //      (check.text.includes("Purple") && isPurpleColor(fontProperty))) {
+                          //      isCorrect = true;
+                          //      break;
+                          //  }
                         } 
                         else if (check.property === "underline" && fontProperty !== "None") {
                             isCorrect = true;
@@ -160,16 +184,11 @@ function isPinkColor(color) {
     return false;
 }
 
-// Updated submit score function to use authenticated user info
+
+
+// Define the submit_score_function with Supabase integration
 async function submit_score_function() {
     document.getElementById("show_submit_div").innerText = "Submitting score to database...";
-    
-    // Get the current user
-    const user = getCurrentUser();
-    if (!user) {
-        document.getElementById("show_submit_div").innerText = "Error: Not logged in. Please refresh and log in again.";
-        return;
-    }
     
     // Import the Supabase client from CDN
     const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm');
@@ -200,103 +219,56 @@ async function submit_score_function() {
         const total = parseInt(scoreMatch[2]);
         const percentage = parseFloat(scoreMatch[3]);
         
-        // Use the authenticated user's email to find their record
+        // Use predefined student and assignment for simplicity 
+        // (in a real app, you might want to get these from a form or other source)
+        const studentName = "Test Student 1"; // Default student name
+        const assignmentName = "test_assignment"; // Default assignment name
+        
+        // 1. Find the student ID
         const { data: studentData, error: studentError } = await supabase
             .from('students')
             .select('student_id')
-            .eq('email', user.email);
+            .eq('student_name', studentName);
 
-        if (studentError) {
+        if (studentError || studentData.length === 0) {
             console.error("Error finding student:", studentError);
-            document.getElementById("show_submit_div").innerText = "Error finding student record. Check console.";
+            document.getElementById("show_submit_div").innerText = "Error finding student. Check console.";
             return;
         }
-        
-        // If no student record exists, create one
-        let studentId;
-        if (studentData.length === 0) {
-            const { data: newStudent, error: createError } = await supabase
-                .from('students')
-                .insert([
-                    { student_name: user.name, email: user.email }
-                ])
-                .select('student_id');
-                
-            if (createError) {
-                console.error("Error creating student:", createError);
-                document.getElementById("show_submit_div").innerText = "Error creating student record. Check console.";
-                return;
-            }
-            
-            studentId = newStudent[0].student_id;
-        } else {
-            studentId = studentData[0].student_id;
-        }
 
-        // Get the assignment name from the current page
-        // This simply uses "formatting_assignment" as a default
-        // In a real app, you might want to store this in the page or pass it as a parameter
-        const assignmentName = "formatting_assignment";
+        const studentId = studentData[0].student_id;
 
-        // Check if an assignment record exists
+        // 2. Find the assignment record ID
         const { data: assignmentData, error: assignmentError } = await supabase
             .from('assignments')
             .select('id')
             .eq('student_id', studentId)
             .eq('assignment_name', assignmentName);
 
-        if (assignmentError) {
+        if (assignmentError || assignmentData.length === 0) {
             console.error("Error finding assignment:", assignmentError);
             document.getElementById("show_submit_div").innerText = "Error finding assignment. Check console.";
+            console.log("Student ID:", studentId);
             return;
         }
 
-        // Update or insert the assignment record
-        let assignmentId;
-        if (assignmentData.length === 0) {
-            // Create new assignment record
-            const { data: newAssignment, error: createAssignmentError } = await supabase
-                .from('assignments')
-                .insert([
-                    { 
-                        student_id: studentId,
-                        assignment_name: assignmentName,
-                        score: percentage,
-                        submission_date: new Date().toISOString()
-                    }
-                ])
-                .select('id');
-                
-            if (createAssignmentError) {
-                console.error("Error creating assignment:", createAssignmentError);
-                document.getElementById("show_submit_div").innerText = "Error creating assignment record. Check console.";
-                return;
-            }
-            
-            assignmentId = newAssignment[0].id;
-            document.getElementById("show_submit_div").innerText = "Score submitted successfully! " + 
-                `${correct}/${total} (${percentage}%)`;
-        } else {
-            // Update existing assignment record
-            assignmentId = assignmentData[0].id;
-            
-            const { error: updateError } = await supabase
-                .from('assignments')
-                .update({ 
-                    score: percentage,
-                    submission_date: new Date().toISOString()
-                })
-                .eq('id', assignmentId);
+        const assignmentId = assignmentData[0].id;
 
-            if (updateError) {
-                console.error("Error updating score:", updateError);
-                document.getElementById("show_submit_div").innerText = "Error updating score. Check console.";
-                return;
-            }
-            
-            document.getElementById("show_submit_div").innerText = "Score updated successfully! " + 
-                `${correct}/${total} (${percentage}%)`;
+        // 3. Update the score
+        const { error: updateError } = await supabase
+            .from('assignments')
+            .update({ score: percentage }) // Using percentage as the score
+            .eq('id', assignmentId);
+
+        if (updateError) {
+            console.error("Error updating score:", updateError);
+            document.getElementById("show_submit_div").innerText = "Error updating score. Check console.";
+            return;
         }
+
+        document.getElementById("show_submit_div").innerText = "Score submitted successfully! " + 
+            `${correct}/${total} (${percentage}%) for ${studentName}, assignment: ${assignmentName}`;
+            
     } catch (error) {
         console.error("Unexpected error:", error);
         document.getElementById("show_submit_div").innerText = "Unexpected error. Check console.";

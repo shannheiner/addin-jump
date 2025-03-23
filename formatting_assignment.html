@@ -4,31 +4,25 @@
     <meta charset="UTF-8">
     <title>Format Checker</title>
     <script src="https://appsforoffice.microsoft.com/lib/1/hosted/Office.js" type="text/javascript"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="taskpane.css">
 </head>
 <body>
-    <div id="app-container">
-        <div id="loading">Loading...</div>
-        
-        <div id="main-content" style="display: none;">
-            <div id="user-info">
-                <span id="username">Student</span>
-                <button id="logout-button">Logout</button>
-            </div>
-            
-            <h1>Format a Fonts Assignment</h1>
-            <a href="index.html">Back to Main</a>
+    <h1>Format Fonts Assignnent</h1>
+    <a href ="index.html">Back to Main</a>
 
-            <button id="checkFormat">Check Formatting</button>
-            <button id="myButton" class="hidden">Submit Score</button>
-
-            <div id="show_submit_div"></div>
-            <div id="result"></div>
-        </div>
-    </div>
+  
     
-    <script src="auth-check.js"></script>
+
+    <button id="checkFormat">Check Formatting</button>
+    <button id="myButton" class="hidden">Submit Score</button>
+
+    <div id="show_submit_div"></div>
+    <div id="result"></div>
     <script src="taskpane.js"></script>
+
+    
+  <!--<button onclick="showButton()">Show Hidden Button</button> -->
+
+
 </body>
 </html>
