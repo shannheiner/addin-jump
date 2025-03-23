@@ -1,0 +1,24 @@
+body {
+    font-family: sans-serif;
+    padding: 10px;
+}
+
+button {
+    padding: 5px;
+    margin-bottom: 10px;
+    background-color: blueviolet;
+    border-radius: 10px;
+}
+
+
+#result {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-top: 10px;
+}
+
+
+.hidden {
+    display:none;
+    
+}
