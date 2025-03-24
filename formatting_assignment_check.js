@@ -140,6 +140,18 @@ function isPinkColor(color) {
     return false;
 }
 
+// Function to check if a color is a shade of pink
+function isPinkColor(color) {
+    if (color.startsWith("#") && color.length === 7) {
+        let r = parseInt(color.substring(1, 3), 16);
+        let g = parseInt(color.substring(3, 5), 16);
+        let b = parseInt(color.substring(5, 7), 16);
+        
+        // A shade of pink generally has high red, medium blue, and low green
+        return r > 200 && b > 150 && g < 150;
+    }
+    return false;
+}
 //-----------------------------------------
 // ... (Part 1 from the previous response) ...
 
