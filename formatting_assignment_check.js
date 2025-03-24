@@ -106,9 +106,14 @@ async function checkFormatting() {
                 );
             }
 
+            // let scorePercentage = ((correctCount / totalCount) * 100).toFixed(2);
+            // let scoreDisplay = `<h3>Score: <span class="math-inline">\{correctCount\}/</span>{totalCount} (${scorePercentage}%)</h3>`;
+            // await context.sync();
+
             let scorePercentage = ((correctCount / totalCount) * 100).toFixed(2);
-            let scoreDisplay = `<h3>Score: <span class="math-inline">\{correctCount\}/</span>{totalCount} (${scorePercentage}%)</h3>`;
-            await context.sync();
+            let scoreDisplay = `<h3>Score: ${correctCount}/${totalCount} (${scorePercentage}%)</h3>`; // Corrected line
+              await context.sync();
+
             document.getElementById("result").innerHTML = scoreDisplay + results.join("");
         });
     } catch (error) {
