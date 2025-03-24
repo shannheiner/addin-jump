@@ -3,35 +3,18 @@ Office.onReady(function (info) {
 });
 
 async function checkFormatting() {
-        
     document.getElementById("myButton").classList.remove("hidden");
 
-    // This is the Submit Score button
-        // if (myButton) {
-        //     myButton.addEventListener("click", function() {
-        //         document.getElementById("show_submit_div").innerText = "Button clicked!";
-        //     });
-        // } else {
-        //     console.error("Button with ID 'myButton' not found. Check your HTML.");
-        // }
-
- // This is the Submit Score button
-    if (myButton) {
-        // Pass the function reference, not the result of calling the function
-        myButton.addEventListener("click", submit_score_function);
+    if (document.getElementById("myButton")) {
+        document.getElementById("myButton").addEventListener("click", submit_score_function);
     } else {
         console.error("Button with ID 'myButton' not found. Check your HTML.");
     }
 
-  
-
-   
     try {
         document.getElementById("result").innerHTML = "";
 
         await Word.run(async (context) => {
-          
-
             let formatChecks = [
                 { text: "Bold1", property: "bold", expected: true },
                 { text: "Italic1", property: "italic", expected: true },
@@ -53,15 +36,12 @@ async function checkFormatting() {
                 { text: "Font_Size_16", property: "size", expected: 16 },
                 { text: "Font_Size_19", property: "size", expected: 19 },
                 { text: "Font_Size_24", property: "size", expected: 24 },
-
-               // { text: "Round 2", property: "none", expected: "none" },
                 { text: "Bold2", property: "bold", expected: true },
                 { text: "Italic2", property: "italic", expected: true },
                 { text: "Underline2", property: "underline", expected: "exists" },
                 { text: "Subscript2", property: "subscript", expected: true },
                 { text: "Superscript2", property: "superscript", expected: true },
                 { text: "Strikethrough2", property: "strikeThrough", expected: true },
-
                 { text: "Font_Type_Verdana Pro", property: "name", expected: "Verdana Pro" },
                 { text: "Font_Type_Cooper Black", property: "name", expected: "Cooper Black" },
                 { text: "Font_Type_Cambria", property: "name", expected: "Cambria" },
@@ -76,7 +56,6 @@ async function checkFormatting() {
                 { text: "Font_Size_15", property: "size", expected: 15 },
                 { text: "Font_Size_36", property: "size", expected: 36 },
                 { text: "Font_Size_46", property: "size", expected: 46 }
-
             ];
 
             let results = [];
@@ -94,7 +73,6 @@ async function checkFormatting() {
                 if (isFound) {
                     for (let i = 0; i < search.items.length; i++) {
                         let fontProperty = search.items[i].font[check.property];
-
                         console.log("Word:", search.items[i].text);
                         console.log(`${check.property}:`, fontProperty);
 
@@ -103,25 +81,16 @@ async function checkFormatting() {
                                 isCorrect = true;
                                 break;
                             }
-                            if ((check.text.includes("Green") && isGreenColor(fontProperty)) || 
-                            (check.text.includes("Purple") && isPurpleColor(fontProperty)) ||
-                            (check.text.includes("Pink") && isPinkColor(fontProperty)) ) {
+                            if ((check.text.includes("Green") && isGreenColor(fontProperty)) ||
+                                (check.text.includes("Purple") && isPurpleColor(fontProperty)) ||
+                                (check.text.includes("Pink") && isPinkColor(fontProperty))) {
+                                isCorrect = true;
+                                break;
+                            }
+                        } else if (check.property === "underline" && fontProperty !== "None") {
                             isCorrect = true;
                             break;
-                             }
-                          
-                          
-                          //  if ((check.text.includes("Green") && isGreenColor(fontProperty)) || 
-                          //      (check.text.includes("Purple") && isPurpleColor(fontProperty))) {
-                          //      isCorrect = true;
-                          //      break;
-                          //  }
-                        } 
-                        else if (check.property === "underline" && fontProperty !== "None") {
-                            isCorrect = true;
-                            break;
-                        } 
-                        else if (fontProperty === check.expected) {
+                        } else if (fontProperty === check.expected) {
                             isCorrect = true;
                             break;
                         }
@@ -138,10 +107,9 @@ async function checkFormatting() {
             }
 
             let scorePercentage = ((correctCount / totalCount) * 100).toFixed(2);
-            let scoreDisplay = `<h3>Score: ${correctCount}/${totalCount} (${scorePercentage}%)</h3>`;
+            let scoreDisplay = `<h3>Score: <span class="math-inline">\{correctCount\}/</span>{totalCount} (${scorePercentage}%)</h3>`;
             await context.sync();
             document.getElementById("result").innerHTML = scoreDisplay + results.join("");
-                
         });
     } catch (error) {
         console.error("Error:", error);
@@ -149,24 +117,12 @@ async function checkFormatting() {
     }
 }
 
-// Function to check if a color is a shade of green
 function isGreenColor(color) {
     if (color.startsWith("#") && color.length === 7) {
         let r = parseInt(color.substring(1, 3), 16);
         let g = parseInt(color.substring(3, 5), 16);
         let b = parseInt(color.substring(5, 7), 16);
         return g > 80 && g >= r * 1.5 && g >= b * 1.5;
-    }
-    return false;
-}
-
-// Function to check if a color is a shade of purple
-function isPurpleColor(color) {
-    if (color.startsWith("#") && color.length === 7) {
-        let r = parseInt(color.substring(1, 3), 16);
-        let g = parseInt(color.substring(3, 5), 16);
-        let b = parseInt(color.substring(5, 7), 16);
-        return r > 60 && b > 60 && g < 80;
     }
     return false;
 }
@@ -184,20 +140,27 @@ function isPinkColor(color) {
     return false;
 }
 
-
+//-----------------------------------------
+// ... (Part 1 from the previous response) ...
 
 // Define the submit_score_function with Supabase integration
 async function submit_score_function() {
     document.getElementById("show_submit_div").innerText = "Submitting score to database...";
-    
+
     // Import the Supabase client from CDN
     const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm');
-    
+
     // Set up Supabase client
     const supabaseUrl = 'https://yrcsoolflpgwackcljjs.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlyY3Nvb2xmbHBnd2Fja2NsampzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI0MzcyNDUsImV4cCI6MjA1ODAxMzI0NX0.aa1AwaVmHQ2CElMFJK10dSvWf3GFKkJ7ePeEcyItUZQ';
     const supabase = createClient(supabaseUrl, supabaseKey);
-    
+
+    const userSession = Office.context.document.settings.get("userSession");
+    if (!userSession || !userSession.token) {
+        document.getElementById("show_submit_div").innerText = "Please log in first.";
+        return;
+    }
+
     try {
         // Get the score from the results
         const scoreElement = document.querySelector("#result h3");
@@ -205,30 +168,25 @@ async function submit_score_function() {
             document.getElementById("show_submit_div").innerText = "Error: Score not found. Please check formatting first.";
             return;
         }
-        
+
         // Extract the score from the scoreElement text (format: "Score: X/Y (Z%)")
         const scoreText = scoreElement.textContent;
         const scoreMatch = scoreText.match(/Score: (\d+)\/(\d+) \(([0-9.]+)%\)/);
-        
+
         if (!scoreMatch) {
             document.getElementById("show_submit_div").innerText = "Error: Could not parse score.";
             return;
         }
-        
+
         const correct = parseInt(scoreMatch[1]);
         const total = parseInt(scoreMatch[2]);
         const percentage = parseFloat(scoreMatch[3]);
-        
-        // Use predefined student and assignment for simplicity 
-        // (in a real app, you might want to get these from a form or other source)
-        const studentName = "Test Student 1"; // Default student name
-        const assignmentName = "test_assignment"; // Default assignment name
-        
-        // 1. Find the student ID
+
+        // Use user id from session.
         const { data: studentData, error: studentError } = await supabase
             .from('students')
             .select('student_id')
-            .eq('student_name', studentName);
+            .eq('user_id', userSession.id);
 
         if (studentError || studentData.length === 0) {
             console.error("Error finding student:", studentError);
@@ -238,12 +196,12 @@ async function submit_score_function() {
 
         const studentId = studentData[0].student_id;
 
-        // 2. Find the assignment record ID
+        // Find the assignment record ID
         const { data: assignmentData, error: assignmentError } = await supabase
             .from('assignments')
             .select('id')
             .eq('student_id', studentId)
-            .eq('assignment_name', assignmentName);
+            .eq('assignment_name', 'test_assignment');
 
         if (assignmentError || assignmentData.length === 0) {
             console.error("Error finding assignment:", assignmentError);
@@ -254,7 +212,7 @@ async function submit_score_function() {
 
         const assignmentId = assignmentData[0].id;
 
-        // 3. Update the score
+        // Update the score
         const { error: updateError } = await supabase
             .from('assignments')
             .update({ score: percentage }) // Using percentage as the score
@@ -266,9 +224,9 @@ async function submit_score_function() {
             return;
         }
 
-        document.getElementById("show_submit_div").innerText = "Score submitted successfully! " + 
-            `${correct}/${total} (${percentage}%) for ${studentName}, assignment: ${assignmentName}`;
-            
+        document.getElementById("show_submit_div").innerText = "Score submitted successfully! " +
+            `${correct}/${total} (${percentage}%) for student, assignment: test_assignment`;
+
     } catch (error) {
         console.error("Unexpected error:", error);
         document.getElementById("show_submit_div").innerText = "Unexpected error. Check console.";
