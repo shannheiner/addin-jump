@@ -249,7 +249,7 @@ async function submit_score_function() {
             document.getElementById("show_submit_div").innerText = `Score submitted successfully! ` +
                 `${correct}/${total} (${percentage}%) - Updated from ${existingScore.toFixed(2)}%`;
         } else {
-            document.getElementById("show_submit_div").innerText = `Existing score (${existingScore.toFixed(2)}%) is lower. Not updated.`;
+            document.getElementById("show_submit_div").innerText = `Previous Score of (${existingScore.toFixed(2)}%) is higher. Not updated.`;
         }
 
     } catch (error) {
