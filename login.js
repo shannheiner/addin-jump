@@ -1,15 +1,8 @@
-Office.onReady(function (info) {
-    // Wait for Supabase to be available
-    const waitForSupabase = setInterval(() => {
-        if (window.supabase) {
-            clearInterval(waitForSupabase); // Stop checking once Supabase is available
-            initializeSupabase();
-        }
-    }, 100); // Check every 100 milliseconds
-
-    function initializeSupabase() {
+window.onload = function() {
+    Office.onReady(function (info) {
         const { createClient } = window.supabase;
-        // Set up Supabase client
+      
+          // Set up Supabase client
     const supabaseUrl = 'https://yrcsoolflpgwackcljjs.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlyY3Nvb2xmbHBnd2Fja2NsampzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI0MzcyNDUsImV4cCI6MjA1ODAxMzI0NX0.aa1AwaVmHQ2CElMFJK10dSvWf3GFKkJ7ePeEcyItUZQ';
     const supabase = createClient(supabaseUrl, supabaseKey);
@@ -24,7 +17,12 @@ Office.onReady(function (info) {
                 messageElement.textContent = "Logging in...";
                 const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
 
-                if (error) throw error;
+                if (error) {
+                    console.error("Supabase sign-in error:", error);
+                    messageElement.textContent = "Login failed: " + (error.message || "Unknown error");
+                    messageElement.style.color = "red";
+                    return;
+                }
 
                 if (data && data.user) {
                     Office.context.document.settings.set("userSession", {
@@ -36,12 +34,16 @@ Office.onReady(function (info) {
                     Office.context.document.settings.saveAsync(() => {
                         window.location.href = "index.html";
                     });
+                } else {
+                    console.error("Supabase sign-in failed: No user data returned.");
+                    messageElement.textContent = "Login failed: No user data returned.";
+                    messageElement.style.color = "red";
                 }
             } catch (error) {
-                console.error("Login error:", error);
-                messageElement.textContent = "Login failed: " + (error.message || "Unknown error");
+                console.error("Unexpected error:", error);
+                messageElement.textContent = "Login failed: Unexpected error.";
                 messageElement.style.color = "red";
             }
         });
-    }
-});
+    });
+};
