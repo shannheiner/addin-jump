@@ -1,11 +1,5 @@
 window.onload = function() {
     Office.onReady(function (info) {
-        const createClient = window.supabase.createClient;
-     // Set up Supabase client
-     const supabaseUrl = 'https://yrcsoolflpgwackcljjs.supabase.co';
-     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlyY3Nvb2xmbHBnd2Fja2NsampzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI0MzcyNDUsImV4cCI6MjA1ODAxMzI0NX0.aa1AwaVmHQ2CElMFJK10dSvWf3GFKkJ7ePeEcyItUZQ';
-     const supabase = createClient(supabaseUrl, supabaseKey);
-
         document.getElementById("login-button").addEventListener("click", async (event) => {
             event.preventDefault();
             const email = document.getElementById("email").value;
@@ -14,6 +8,12 @@ window.onload = function() {
 
             try {
                 messageElement.textContent = "Logging in...";
+                const createClient = window.supabase.createClient;
+               // Set up Supabase client
+    const supabaseUrl = 'https://yrcsoolflpgwackcljjs.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlyY3Nvb2xmbHBnd2Fja2NsampzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI0MzcyNDUsImV4cCI6MjA1ODAxMzI0NX0.aa1AwaVmHQ2CElMFJK10dSvWf3GFKkJ7ePeEcyItUZQ';
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
                 const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
 
                 if (error) {
