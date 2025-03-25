@@ -218,7 +218,7 @@ async function submit_score_function() {
             .from('assignments')
             .select('id, score')
             .eq('student_id', studentId)
-            .eq('assignment_name', 'test_assignment')
+            .eq('assignment_name', 'formatting_assignment')
             .single();
 
         if (assignmentError || !assignmentData) {
