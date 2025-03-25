@@ -230,8 +230,8 @@ async function submit_score_function() {
         const assignmentId = assignmentData.id;
         const existingScore = assignmentData.score || 0;
 
-        // Only update if new score is LOWER
-        if (percentage > existingScore) {
+        // Only update if new score is Higher
+        if (percentage >= existingScore) {
             const { error: updateError } = await supabase
                 .from('assignments')
                 .update({ 
@@ -249,7 +249,7 @@ async function submit_score_function() {
             document.getElementById("show_submit_div").innerText = `Score submitted successfully! ` +
                 `${correct}/${total} (${percentage}%) - Updated from ${existingScore.toFixed(2)}%`;
         } else {
-            document.getElementById("show_submit_div").innerText = `Previous Score of (${existingScore.toFixed(2)}%) is higher. Not updated.`;
+            document.getElementById("show_submit_div").innerText = `Previous Score of (${existingScore.toFixed(2)}%) is higher. Previous Score kept.`;
         }
 
     } catch (error) {
