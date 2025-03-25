@@ -161,13 +161,15 @@ function isPurpleColor(color) {
 async function submit_score_function() {
     document.getElementById("show_submit_div").innerText = "Submitting score to database...";
 
-    // Import the Supabase client from CDN
-    const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm');
-
-    // Set up Supabase client
-    const supabaseUrl = 'https://yrcsoolflpgwackcljjs.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlyY3Nvb2xmbHBnd2Fja2NsampzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI0MzcyNDUsImV4cCI6MjA1ODAxMzI0NX0.aa1AwaVmHQ2CElMFJK10dSvWf3GFKkJ7ePeEcyItUZQ';
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    // Prevent multiple Supabase initializations
+    let supabase;
+    if (!window.supabaseClient) {
+        const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm');
+        supabase = createClient('https://yrcsoolflpgwackcljjs.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlyY3Nvb2xmbHBnd2Fja2NsampzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI0MzcyNDUsImV4cCI6MjA1ODAxMzI0NX0.aa1AwaVmHQ2CElMFJK10dSvWf3GFKkJ7ePeEcyItUZQ');
+        window.supabaseClient = supabase;
+    } else {
+        supabase = window.supabaseClient;
+    }
 
     const userSession = Office.context.document.settings.get("userSession");
     if (!userSession || !userSession.token) {
@@ -201,7 +203,7 @@ async function submit_score_function() {
             .from('students')
             .select('student_id')
             .eq('supabase_user_id', userSession.id)
-            .single(); // Use single() to get the first matching record
+            .single();
 
         if (studentError || !studentData) {
             console.error("Error finding student:", studentError);
@@ -214,10 +216,10 @@ async function submit_score_function() {
         // Find the existing assignment
         const { data: assignmentData, error: assignmentError } = await supabase
             .from('assignments')
-            .select('id')
+            .select('id, score')
             .eq('student_id', studentId)
             .eq('assignment_name', 'test_assignment')
-            .single(); // Use single() to get the first matching record
+            .single();
 
         if (assignmentError || !assignmentData) {
             console.error("Error finding assignment:", assignmentError);
@@ -226,24 +228,29 @@ async function submit_score_function() {
         }
 
         const assignmentId = assignmentData.id;
+        const existingScore = assignmentData.score || 0;
 
-        // Update the existing assignment score
-        const { error: updateError } = await supabase
-            .from('assignments')
-            .update({ 
-                score: percentage,
-                date_completed: new Date().toISOString()
-            })
-            .eq('id', assignmentId);
+        // Only update if new score is LOWER
+        if (percentage < existingScore) {
+            const { error: updateError } = await supabase
+                .from('assignments')
+                .update({ 
+                    score: percentage,
+                    date_completed: new Date().toISOString()
+                })
+                .eq('id', assignmentId);
 
-        if (updateError) {
-            console.error("Error updating score:", updateError);
-            document.getElementById("show_submit_div").innerText = "Error updating score. Check console.";
-            return;
+            if (updateError) {
+                console.error("Error updating score:", updateError);
+                document.getElementById("show_submit_div").innerText = "Error updating score. Check console.";
+                return;
+            }
+
+            document.getElementById("show_submit_div").innerText = `Score submitted successfully! ` +
+                `${correct}/${total} (${percentage}%) - Updated from ${existingScore.toFixed(2)}%`;
+        } else {
+            document.getElementById("show_submit_div").innerText = `Existing score (${existingScore.toFixed(2)}%) is lower. Not updated.`;
         }
-
-        document.getElementById("show_submit_div").innerText = "Score submitted successfully! " +
-            `${correct}/${total} (${percentage}%) for student, assignment: test_assignment`;
 
     } catch (error) {
         console.error("Unexpected error:", error);
