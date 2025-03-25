@@ -6,20 +6,19 @@ window.onload = function() {
             const password = document.getElementById("password").value;
             const messageElement = document.getElementById("login-message");
 
-            let supabaseClient;
-
             try {
                 messageElement.textContent = "Logging in...";
 
                 // Ensure window.supabase is available before initialization
                 if (window.supabase && window.supabase.createClient) {
                     const createClient = window.supabase.createClient;
-          // Set up Supabase client
-    const supabaseUrl = 'https://yrcsoolflpgwackcljjs.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlyY3Nvb2xmbHBnd2Fja2NsampzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI0MzcyNDUsImV4cCI6MjA1ODAxMzI0NX0.aa1AwaVmHQ2CElMFJK10dSvWf3GFKkJ7ePeEcyItUZQ';
-    const supabase = createClient(supabaseUrl, supabaseKey);
+                    
+                    // Set up Supabase client
+                    const supabaseUrl = 'https://yrcsoolflpgwackcljjs.supabase.co';
+                    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlyY3Nvb2xmbHBnd2Fja2NsampzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI0MzcyNDUsImV4cCI6MjA1ODAxMzI0NX0.aa1AwaVmHQ2CElMFJK10dSvWf3GFKkJ7ePeEcyItUZQ';
+                    const supabase = createClient(supabaseUrl, supabaseKey);
 
-                    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+                    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
                     if (error) {
                         console.error("Supabase sign-in error:", error);
