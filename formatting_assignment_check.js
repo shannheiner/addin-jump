@@ -196,7 +196,7 @@ async function submit_score_function() {
 
         const correct = parseInt(scoreMatch[1]);
         const total = parseInt(scoreMatch[2]);
-        const percentage = parseFloat(scoreMatch[3]);
+        const percentage = Math.round(parseFloat(scoreMatch[3])); // Round to nearest integer
 
         // Find student using supabase_user_id
         const { data: studentData, error: studentError } = await supabase
@@ -235,7 +235,7 @@ async function submit_score_function() {
             const { error: updateError } = await supabase
                 .from('assignments')
                 .update({ 
-                    score: percentage,
+                    score: percentage, // Now an integer
                     date_completed: new Date().toISOString()
                 })
                 .eq('id', assignmentId);
@@ -247,9 +247,9 @@ async function submit_score_function() {
             }
 
             document.getElementById("show_submit_div").innerText = `Score submitted successfully! ` +
-                `${correct}/${total} (${percentage}%) - Updated from ${existingScore.toFixed(2)}%`;
+                `${correct}/${total} (${percentage}%) - Updated from ${existingScore}%`;
         } else {
-            document.getElementById("show_submit_div").innerText = `Existing score (${existingScore.toFixed(2)}%) is lower. Not updated.`;
+            document.getElementById("show_submit_div").innerText = `Existing score (${existingScore}%) is lower. Not updated.`;
         }
 
     } catch (error) {
