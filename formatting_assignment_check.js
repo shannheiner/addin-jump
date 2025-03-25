@@ -158,7 +158,6 @@ function isPurpleColor(color) {
 //-----------------------------------------
 // ... (Part 1 from the previous response) ...
 
-// Define the submit_score_function with Supabase integration
 async function submit_score_function() {
     document.getElementById("show_submit_div").innerText = "Submitting score to database...";
 
@@ -197,40 +196,44 @@ async function submit_score_function() {
         const total = parseInt(scoreMatch[2]);
         const percentage = parseFloat(scoreMatch[3]);
 
-        // Use user id from session.
+        // Find student using supabase_user_id
         const { data: studentData, error: studentError } = await supabase
             .from('students')
             .select('student_id')
-            .eq('user_id', userSession.id);
+            .eq('supabase_user_id', userSession.id)
+            .single(); // Use single() to get the first matching record
 
-        if (studentError || studentData.length === 0) {
+        if (studentError || !studentData) {
             console.error("Error finding student:", studentError);
             document.getElementById("show_submit_div").innerText = "Error finding student. Check console.";
             return;
         }
 
-        const studentId = studentData[0].student_id;
+        const studentId = studentData.student_id;
 
-        // Find the assignment record ID
+        // Find the existing assignment
         const { data: assignmentData, error: assignmentError } = await supabase
             .from('assignments')
             .select('id')
             .eq('student_id', studentId)
-            .eq('assignment_name', 'test_assignment');
+            .eq('assignment_name', 'test_assignment')
+            .single(); // Use single() to get the first matching record
 
-        if (assignmentError || assignmentData.length === 0) {
+        if (assignmentError || !assignmentData) {
             console.error("Error finding assignment:", assignmentError);
             document.getElementById("show_submit_div").innerText = "Error finding assignment. Check console.";
-            console.log("Student ID:", studentId);
             return;
         }
 
-        const assignmentId = assignmentData[0].id;
+        const assignmentId = assignmentData.id;
 
-        // Update the score
+        // Update the existing assignment score
         const { error: updateError } = await supabase
             .from('assignments')
-            .update({ score: percentage }) // Using percentage as the score
+            .update({ 
+                score: percentage,
+                date_completed: new Date().toISOString()
+            })
             .eq('id', assignmentId);
 
         if (updateError) {
