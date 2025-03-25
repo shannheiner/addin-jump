@@ -231,7 +231,7 @@ async function submit_score_function() {
         const existingScore = assignmentData.score || 0;
 
         // Only update if new score is LOWER
-        if (percentage < existingScore) {
+        if (percentage > existingScore) {
             const { error: updateError } = await supabase
                 .from('assignments')
                 .update({ 
