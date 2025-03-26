@@ -1,6 +1,3 @@
-const ASSIGNMENT_NAME = "formatting_assignment"; // Change this to update the assignment name
-
-
 Office.onReady(function (info) {
     document.getElementById("checkFormat").addEventListener("click", checkFormatting);
 });
@@ -218,12 +215,19 @@ async function submit_score_function() {
 
         const studentId = studentData.student_id;
 
+        //-----------------------------------------------------------------------------------------
+        //-----------------------------------------------------------------------------------------
+        //-----------------------------------------------------------------------------------------
+        // .eq('assignment_name', 'formatting_assignment')  <-- change the assignment name here --> 'formatting_assignment'
+        //-----------------------------------------------------------------------------------------
+        //-----------------------------------------------------------------------------------------
+        //-----------------------------------------------------------------------------------------
         // Find the existing assignment
         const { data: assignmentData, error: assignmentError } = await supabase
             .from('assignments')
             .select('id, score')
             .eq('student_id', studentId)
-            .eq('assignment_name', 'ASSIGNMENT_NAME')
+            .eq('assignment_name', 'formatting_assignment')
             .single();
 
         if (assignmentError || !assignmentData) {
