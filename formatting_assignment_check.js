@@ -1,3 +1,6 @@
+const ASSIGNMENT_NAME = "formatting_assignment"; // Change this to update the assignment name
+
+
 Office.onReady(function (info) {
     document.getElementById("checkFormat").addEventListener("click", checkFormatting);
 });
@@ -158,6 +161,8 @@ function isPurpleColor(color) {
 //-----------------------------------------
 // ... (Part 1 from the previous response) ...
 
+
+
 async function submit_score_function() {
     document.getElementById("show_submit_div").innerText = "Submitting score to database...";
 
@@ -218,7 +223,7 @@ async function submit_score_function() {
             .from('assignments')
             .select('id, score')
             .eq('student_id', studentId)
-            .eq('assignment_name', 'formatting_assignment')
+            .eq('assignment_name', 'ASSIGNMENT_NAME')
             .single();
 
         if (assignmentError || !assignmentData) {
