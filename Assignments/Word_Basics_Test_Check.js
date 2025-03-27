@@ -39,11 +39,11 @@ async function checkFormatting() {
 
                 { text: "Align_Center", property: "center", expected: Word.Alignment.center },
                 
-                { text: "Align_Left", property: "alignment", expected: "Left" },
-                { text: "Align_Right", property: "alignment", expected: "Right" },
+                { text: "Align_Left", property: "alignment", expected: Word.Alignment.left},
+                { text: "Align_Right", property: "alignment", expected: Word.Alignment.right},
                 //{ text: "LeftAlign", property: "alignment", expected: "Left" }
 
-                { text: "Bold2", property: "bold", expected: true },
+                { text: "Bold2", property: "bold", expected: Word.Font.bold },
                 { text: "Italic2", property: "italic", expected: true },
                 { text: "Underline2", property: "underline", expected: "exists" },
                 { text: "Subscript2", property: "subscript", expected: true },
