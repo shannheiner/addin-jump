@@ -83,7 +83,7 @@ async function checkFormatting() {
                         let fontProperty = search.items[i].font[check.property];
                         console.log("Word:", search.items[i].text);
                         console.log(`${check.property}:`, fontProperty);
-                        console.log("Paragraph Range:", search.items[i].parentParagraph.getRange().text);
+                        // console.log("Paragraph Range:", search.items[i].parentParagraph.getRange().text);
 
                         if (check.property === "highlightColor" || check.property === "color") {
                             if (Array.isArray(check.expected) && check.expected.includes(fontProperty)) {
