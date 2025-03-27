@@ -37,9 +37,9 @@ async function checkFormatting() {
                 { text: "Font_Size_19", property: "size", expected: 19 },
                 { text: "Font_Size_24", property: "size", expected: 24 },
 
-                { text: "Align_Center", property: "alignment", expected: Alignment.CENTER },
-                { text: "Align_Left", property: "alignment", expected: Alignment.LEFT },
-                { text: "Align_Right", property: "alignment", expected: Alignment.RIGHT },
+                { text: "Align_Center", property: "alignment", expected: CENTER },
+                { text: "Align_Left", property: "alignment", expected: LEFT },
+                { text: "Align_Right", property: "alignment", expected: RIGHT },
 
                 { text: "Bold2", property: "bold", expected: true },
                 { text: "Italic2", property: "italic", expected: true },
