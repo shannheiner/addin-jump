@@ -1,4 +1,6 @@
-import { submitScore } from './scoreSubmission.js';
+Office.onReady(function (info) {
+    document.getElementById("checkFormat").addEventListener("click", checkFormatting);
+});
 
 async function checkFormatting() {
     document.getElementById("myButton").classList.remove("hidden");
@@ -34,7 +36,26 @@ async function checkFormatting() {
                 { text: "Font_Size_16", property: "size", expected: 16 },
                 { text: "Font_Size_19", property: "size", expected: 19 },
                 { text: "Font_Size_24", property: "size", expected: 24 },
-                // ... (rest of your original formatChecks array)
+                { text: "Bold2", property: "bold", expected: true },
+                { text: "Italic2", property: "italic", expected: true },
+                { text: "Underline2", property: "underline", expected: "exists" },
+                { text: "Subscript2", property: "subscript", expected: true },
+                { text: "Superscript2", property: "superscript", expected: true },
+                { text: "Strikethrough2", property: "strikeThrough", expected: true },
+                { text: "Font_Type_Verdana Pro", property: "name", expected: "Verdana Pro" },
+                { text: "Font_Type_Cooper Black", property: "name", expected: "Cooper Black" },
+                { text: "Font_Type_Cambria", property: "name", expected: "Cambria" },
+                { text: "Font_Type_Georgia Pro", property: "name", expected: "Georgia Pro" },
+                { text: "Font_Color_Blue", property: "color", expected: ["#0070C0", "blue"] },
+                { text: "Font_Color_Orange", property: "color", expected: ["#FFC000", "orange"] },
+                { text: "Font_Color_Pink", property: "color", expected: ["#FFC0CB", "pink"] },
+                { text: "Highlighted_Blue", property: "highlightColor", expected: ["#0000FF", "blue"] },
+                { text: "Highlight_Magenta", property: "highlightColor", expected: ["magenta", "#FF00FF"] },
+                { text: "Highlight_Red", property: "highlightColor", expected: ["red", "#FF0000"] },
+                { text: "Font_Size_10", property: "size", expected: 10 },
+                { text: "Font_Size_15", property: "size", expected: 15 },
+                { text: "Font_Size_36", property: "size", expected: 36 },
+                { text: "Font_Size_46", property: "size", expected: 46 }
             ];
 
             let results = [];
@@ -85,9 +106,14 @@ async function checkFormatting() {
                 );
             }
 
+            // let scorePercentage = ((correctCount / totalCount) * 100).toFixed(2);
+            // let scoreDisplay = `<h3>Score: <span class="math-inline">\{correctCount\}/</span>{totalCount} (${scorePercentage}%)</h3>`;
+            // await context.sync();
+           
+
             let scorePercentage = ((correctCount / totalCount) * 100).toFixed(2);
-            let scoreDisplay = `<h3>Score: ${correctCount}/${totalCount} (${scorePercentage}%)</h3>`;
-            await context.sync();
+            let scoreDisplay = `<h3>Score: ${correctCount}/${totalCount} (${scorePercentage}%)</h3>`; // Corrected line
+              await context.sync();
 
             document.getElementById("result").innerHTML = scoreDisplay + results.join("");
         });
@@ -97,42 +123,6 @@ async function checkFormatting() {
     }
 }
 
-async function submit_score_function() {
-    document.getElementById("show_submit_div").innerText = "Submitting score to database...";
-
-    // Extract score information from the result
-    const scoreElement = document.querySelector("#result h3");
-    if (!scoreElement) {
-        document.getElementById("show_submit_div").innerText = "Error: Score not found. Please check formatting first.";
-        return;
-    }
-
-    // Extract the score from the scoreElement text (format: "Score: X/Y (Z%)")
-    const scoreText = scoreElement.textContent;
-    const scoreMatch = scoreText.match(/Score: (\d+)\/(\d+) \(([0-9.]+)%\)/);
-
-    if (!scoreMatch) {
-        document.getElementById("show_submit_div").innerText = "Error: Could not parse score.";
-        return;
-    }
-
-    const correct = parseInt(scoreMatch[1]);
-    const total = parseInt(scoreMatch[2]);
-    const percentage = parseFloat(scoreMatch[3]);
-
-    // Call the new modular submit score function
-    const result = await submitScore({
-        assignmentName: 'formatting_assignment', // Easily changeable for different assignments
-        correctCount: correct,
-        totalCount: total,
-        percentage: percentage
-    });
-
-    // Update the UI based on the submission result
-    document.getElementById("show_submit_div").innerText = result.message;
-}
-
-// Helper color checking functions (I noticed these were missing in the previous code)
 function isGreenColor(color) {
     if (color.startsWith("#") && color.length === 7) {
         let r = parseInt(color.substring(1, 3), 16);
@@ -143,6 +133,7 @@ function isGreenColor(color) {
     return false;
 }
 
+// Function to check if a color is a shade of pink
 function isPinkColor(color) {
     if (color.startsWith("#") && color.length === 7) {
         let r = parseInt(color.substring(1, 3), 16);
@@ -155,6 +146,7 @@ function isPinkColor(color) {
     return false;
 }
 
+// Function to check if a color is a shade of purple
 function isPurpleColor(color) {
     if (color.startsWith("#") && color.length === 7) {
         let r = parseInt(color.substring(1, 3), 16);
@@ -164,5 +156,114 @@ function isPurpleColor(color) {
     }
     return false;
 }
+//-----------------------------------------
+// ... (Part 1 from the previous response) ...
 
-export { checkFormatting, submit_score_function };
+
+
+async function submit_score_function() {
+    document.getElementById("show_submit_div").innerText = "Submitting score to database...";
+
+    // Prevent multiple Supabase initializations
+    let supabase;
+    if (!window.supabaseClient) {
+        const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm');
+        supabase = createClient('https://yrcsoolflpgwackcljjs.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlyY3Nvb2xmbHBnd2Fja2NsampzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI0MzcyNDUsImV4cCI6MjA1ODAxMzI0NX0.aa1AwaVmHQ2CElMFJK10dSvWf3GFKkJ7ePeEcyItUZQ');
+        window.supabaseClient = supabase;
+    } else {
+        supabase = window.supabaseClient;
+    }
+
+    const userSession = Office.context.document.settings.get("userSession");
+    if (!userSession || !userSession.token) {
+        document.getElementById("show_submit_div").innerText = "Please log in first.";
+        return;
+    }
+
+    try {
+        // Get the score from the results
+        const scoreElement = document.querySelector("#result h3");
+        if (!scoreElement) {
+            document.getElementById("show_submit_div").innerText = "Error: Score not found. Please check formatting first.";
+            return;
+        }
+
+        // Extract the score from the scoreElement text (format: "Score: X/Y (Z%)")
+        const scoreText = scoreElement.textContent;
+        const scoreMatch = scoreText.match(/Score: (\d+)\/(\d+) \(([0-9.]+)%\)/);
+
+        if (!scoreMatch) {
+            document.getElementById("show_submit_div").innerText = "Error: Could not parse score.";
+            return;
+        }
+
+        const correct = parseInt(scoreMatch[1]);
+        const total = parseInt(scoreMatch[2]);
+        const percentage = parseFloat(scoreMatch[3]);
+
+        // Find student using supabase_user_id
+        const { data: studentData, error: studentError } = await supabase
+            .from('students')
+            .select('student_id')
+            .eq('supabase_user_id', userSession.id)
+            .single();
+
+        if (studentError || !studentData) {
+            console.error("Error finding student:", studentError);
+            document.getElementById("show_submit_div").innerText = "Error finding student. Check console.";
+            return;
+        }
+
+        const studentId = studentData.student_id;
+
+        //-----------------------------------------------------------------------------------------
+        //-----------------------------------------------------------------------------------------
+        //-----------------------------------------------------------------------------------------
+        // .eq('assignment_name', 'formatting_assignment')  <-- change the assignment name here --> 'formatting_assignment'
+        //-----------------------------------------------------------------------------------------
+        //-----------------------------------------------------------------------------------------
+        //-----------------------------------------------------------------------------------------
+        // Find the existing assignment
+        const { data: assignmentData, error: assignmentError } = await supabase
+            .from('assignments')
+            .select('id, score')
+            .eq('student_id', studentId)
+            .eq('assignment_name', 'formatting_assignment')
+            .single();
+
+        if (assignmentError || !assignmentData) {
+            console.error("Error finding assignment:", assignmentError);
+            document.getElementById("show_submit_div").innerText = "Error finding assignment. Check console.";
+            return;
+        }
+
+        const assignmentId = assignmentData.id;
+        const existingScore = assignmentData.score || 0;
+
+        // Only update if new score is Higher
+        if (percentage >= existingScore) {
+            const { error: updateError } = await supabase
+                .from('assignments')
+                .update({ 
+                    score: percentage,
+                    date_completed: new Date().toISOString()
+                })
+                .eq('id', assignmentId);
+
+            if (updateError) {
+                console.error("Error updating score:", updateError);
+                document.getElementById("show_submit_div").innerText = "Error updating score. Check console.";
+                return;
+            }
+
+            document.getElementById("show_submit_div").innerText = `Score submitted successfully! ` +
+                `${correct}/${total} (${percentage}%) - Updated from ${existingScore.toFixed(2)}%`;
+        } else {
+            document.getElementById("show_submit_div").innerText = `Previous Score of (${existingScore.toFixed(2)}%) is higher. Previous Score kept.`;
+        }
+
+    } catch (error) {
+        console.error("Unexpected error:", error);
+        document.getElementById("show_submit_div").innerText = "Unexpected error. Check console.";
+    }
+}
