@@ -37,7 +37,8 @@ async function checkFormatting() {
                 { text: "Font_Size_19", property: "size", expected: 19 },
                 { text: "Font_Size_24", property: "size", expected: 24 },
 
-                { text: "Align_Center", property: "center", expected: true },
+                { text: "Align_Center", property: "center", expected: Word.Alignment.center },
+                
                 { text: "Align_Left", property: "alignment", expected: "Left" },
                 { text: "Align_Right", property: "alignment", expected: "Right" },
                 //{ text: "LeftAlign", property: "alignment", expected: "Left" }
@@ -70,7 +71,7 @@ async function checkFormatting() {
 
             for (let check of formatChecks) {
                 let search = context.document.body.search(check.text, { matchWholeWord: true });
-                search.load("items/pragraphFormat,items/paragraphFormat/alignment/center,items/paragraphFormat/alignment,items/font, items/font/bold, items/font/italic, items/font/underline, items/font/strikeThrough, items/font/subscript, items/font/superscript, items/font/color, items/font/highlightColor, items/font/name, items/font/size, items/text");
+                search.load("items/paragraphFormat,items/paragraphFormat/alignment/center,items/paragraphFormat/alignment,items/font, items/font/bold, items/font/italic, items/font/underline, items/font/strikeThrough, items/font/subscript, items/font/superscript, items/font/color, items/font/highlightColor, items/font/name, items/font/size, items/text");
                 
                 await context.sync();
                
