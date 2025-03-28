@@ -3,7 +3,7 @@ Office.onReady(function (info) {
 });
 
 
-const Word = require('office-js').Word;
+//const Word = require('office-js').Word;
 
 async function checkFormatting() {
     document.getElementById("myButton").classList.remove("hidden");
