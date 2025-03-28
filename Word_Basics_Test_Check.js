@@ -2,8 +2,6 @@ Office.onReady(function (info) {
     document.getElementById("checkFormat").addEventListener("click", checkFormatting);
 });
 
-
-
 async function checkFormatting() {
     document.getElementById("myButton").classList.remove("hidden");
 
@@ -38,10 +36,26 @@ async function checkFormatting() {
                 { text: "Font_Size_16", property: "size", expected: 16 },
                 { text: "Font_Size_19", property: "size", expected: 19 },
                 { text: "Font_Size_24", property: "size", expected: 24 },
-                { text: "Align_Left", property: "alignment", expected: "left" },
-                { text: "Align_Right", property: "alignment", expected: "right" },
-                { text: "Align_Center", property: "alignment", expected: "center" }
-                // ... rest of the checks
+                { text: "Bold2", property: "bold", expected: true },
+                { text: "Italic2", property: "italic", expected: true },
+                { text: "Underline2", property: "underline", expected: "exists" },
+                { text: "Subscript2", property: "subscript", expected: true },
+                { text: "Superscript2", property: "superscript", expected: true },
+                { text: "Strikethrough2", property: "strikeThrough", expected: true },
+                { text: "Font_Type_Verdana Pro", property: "name", expected: "Verdana Pro" },
+                { text: "Font_Type_Cooper Black", property: "name", expected: "Cooper Black" },
+                { text: "Font_Type_Cambria", property: "name", expected: "Cambria" },
+                { text: "Font_Type_Georgia Pro", property: "name", expected: "Georgia Pro" },
+                { text: "Font_Color_Blue", property: "color", expected: ["#0070C0", "blue"] },
+                { text: "Font_Color_Orange", property: "color", expected: ["#FFC000", "orange"] },
+                { text: "Font_Color_Pink", property: "color", expected: ["#FFC0CB", "pink"] },
+                { text: "Highlighted_Blue", property: "highlightColor", expected: ["#0000FF", "blue"] },
+                { text: "Highlight_Magenta", property: "highlightColor", expected: ["magenta", "#FF00FF"] },
+                { text: "Highlight_Red", property: "highlightColor", expected: ["red", "#FF0000"] },
+                { text: "Font_Size_10", property: "size", expected: 10 },
+                { text: "Font_Size_15", property: "size", expected: 15 },
+                { text: "Font_Size_36", property: "size", expected: 36 },
+                { text: "Font_Size_46", property: "size", expected: 46 }
             ];
 
             let results = [];
@@ -50,118 +64,35 @@ async function checkFormatting() {
 
             for (let check of formatChecks) {
                 let search = context.document.body.search(check.text, { matchWholeWord: true });
-                
-                // Comprehensive loading of properties
-                search.load(
-                    "items, " +
-                    "items/paragraphFormat, " +
-                    "items/paragraphFormat/alignment, " + 
-                    "items/font, " +
-                    "items/font/bold, " +
-                    "items/font/italic, " +
-                    "items/font/underline, " +
-                    "items/font/strikeThrough, " +
-                    "items/font/subscript, " +
-                    "items/font/superscript, " +
-                    "items/font/color, " +
-                    "items/font/highlightColor, " +
-                    "items/font/name, " +
-                    "items/font/size, " +
-                    "items/text"
-                );
-                
+                search.load("items/font, items/font/bold, items/font/italic, items/font/underline, items/font/strikeThrough, items/font/subscript, items/font/superscript, items/font/color, items/font/highlightColor, items/font/name, items/font/size, items/text");
                 await context.sync();
 
                 let isCorrect = false;
                 let isFound = search.items.length > 0;
 
-                console.log(`Checking ${check.text}:`, {
-                    property: check.property,
-                    expected: check.expected,
-                    foundItems: search.items.length
-                });
-
                 if (isFound) {
                     for (let i = 0; i < search.items.length; i++) {
-                        // Debug logging for each search item
-                        console.log(`Search Item ${i}:`, {
-                            text: search.items[i].text,
-                            font: search.items[i].font,
-                            paragraphFormat: search.items[i].paragraphFormat
-                        });
+                        let fontProperty = search.items[i].font[check.property];
+                        console.log("Word:", search.items[i].text);
+                        console.log(`${check.property}:`, fontProperty);
 
-                        // Alignment check
-                        if (check.property === "alignment") {
-                            const alignmentMap = {
-                                "left": Word.Alignment.left,
-                                "center": Word.Alignment.center,
-                                "right": Word.Alignment.right
-                            };
-
-                            try {
-                                if (search.items[i].paragraphFormat && 
-                                    search.items[i].paragraphFormat.alignment !== undefined) {
-                                    
-                                    console.log("Current Alignment:", search.items[i].paragraphFormat.alignment);
-                                    console.log("Expected Alignment:", alignmentMap[check.expected.toLowerCase()]);
-
-                                    if (search.items[i].paragraphFormat.alignment === alignmentMap[check.expected.toLowerCase()]) {
-                                        isCorrect = true;
-                                        break;
-                                    }
-                                }
-                            } catch (alignmentError) {
-                                console.error("Alignment check error:", alignmentError);
+                        if (check.property === "highlightColor" || check.property === "color") {
+                            if (Array.isArray(check.expected) && check.expected.includes(fontProperty)) {
+                                isCorrect = true;
+                                break;
                             }
-                        }
-                        // Other property checks
-                        else {
-                            try {
-                                // Ensure font exists before accessing properties
-                                if (!search.items[i].font) {
-                                    console.error(`No font found for item: ${search.items[i].text}`);
-                                    continue;
-                                }
-
-                                let fontProperty;
-                                try {
-                                    fontProperty = search.items[i].font[check.property];
-                                } catch (propError) {
-                                    console.error(`Error accessing ${check.property}:`, propError);
-                                    continue;
-                                }
-
-                                console.log(`Checking ${check.property}:`, {
-                                    actual: fontProperty,
-                                    expected: check.expected
-                                });
-
-                                // Color and highlight color checks
-                                if (check.property === "highlightColor" || check.property === "color") {
-                                    if (Array.isArray(check.expected) && check.expected.includes(fontProperty)) {
-                                        isCorrect = true;
-                                        break;
-                                    }
-                                    if ((check.text.includes("Green") && isGreenColor(fontProperty)) ||
-                                        (check.text.includes("Purple") && isPurpleColor(fontProperty)) ||
-                                        (check.text.includes("Pink") && isPinkColor(fontProperty))) {
-                                        isCorrect = true;
-                                        break;
-                                    }
-                                } 
-                                // Underline check
-                                else if (check.property === "underline" && fontProperty !== "None") {
-                                    isCorrect = true;
-                                    break;
-                                } 
-                                // Direct comparison for other properties
-                                else if (fontProperty === check.expected) {
-                                    isCorrect = true;
-                                    break;
-                                }
-                            } catch (checkError) {
-                                console.error(`Error checking ${check.text}:`, checkError);
+                            if ((check.text.includes("Green") && isGreenColor(fontProperty)) ||
+                                (check.text.includes("Purple") && isPurpleColor(fontProperty)) ||
+                                (check.text.includes("Pink") && isPinkColor(fontProperty))) {
+                                isCorrect = true;
+                                break;
                             }
+                        } else if (check.property === "underline" && fontProperty !== "None") {
+                            isCorrect = true;
+                            break;
+                        } else if (fontProperty === check.expected) {
+                            isCorrect = true;
+                            break;
                         }
                     }
                 }
@@ -175,14 +106,19 @@ async function checkFormatting() {
                 );
             }
 
+            // let scorePercentage = ((correctCount / totalCount) * 100).toFixed(2);
+            // let scoreDisplay = `<h3>Score: <span class="math-inline">\{correctCount\}/</span>{totalCount} (${scorePercentage}%)</h3>`;
+            // await context.sync();
+           
+
             let scorePercentage = ((correctCount / totalCount) * 100).toFixed(2);
-            let scoreDisplay = `<h3>Score: ${correctCount}/${totalCount} (${scorePercentage}%)</h3>`;
-            await context.sync();
+            let scoreDisplay = `<h3>Score: ${correctCount}/${totalCount} (${scorePercentage}%)</h3>`; // Corrected line
+              await context.sync();
 
             document.getElementById("result").innerHTML = scoreDisplay + results.join("");
         });
     } catch (error) {
-        console.error("Unexpected Error:", error);
+        console.error("Error:", error);
         document.getElementById("result").innerHTML = "Error: " + error.message;
     }
 }
@@ -197,17 +133,20 @@ function isGreenColor(color) {
     return false;
 }
 
+// Function to check if a color is a shade of pink
 function isPinkColor(color) {
     if (color.startsWith("#") && color.length === 7) {
         let r = parseInt(color.substring(1, 3), 16);
         let g = parseInt(color.substring(3, 5), 16);
         let b = parseInt(color.substring(5, 7), 16);
         
+        // A shade of pink generally has high red, medium blue, and low green
         return r > 200 && b > 150 && g < 150;
     }
     return false;
 }
 
+// Function to check if a color is a shade of purple
 function isPurpleColor(color) {
     if (color.startsWith("#") && color.length === 7) {
         let r = parseInt(color.substring(1, 3), 16);
@@ -217,11 +156,6 @@ function isPurpleColor(color) {
     }
     return false;
 }
-
-// The existing submit_score_function remains the same as in your original code
-
-    // ... (previous implementation)
-
 //-----------------------------------------
 // ... (Part 1 from the previous response) ...
 
