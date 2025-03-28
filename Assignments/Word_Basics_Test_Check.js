@@ -37,10 +37,15 @@ async function checkFormatting() {
                 { text: "Font_Size_19", property: "size", expected: 19 },
                 { text: "Font_Size_24", property: "size", expected: 24 },
 
+                
+                //Does not work 
+              //  { text: "Align_Center", property: "center", expected: Word.Alignment.center },
+
                 { text: "Align_Center", property: "center", expected: Word.Alignment.center },
                 
                 { text: "Align_Left", property: "left", expected: Word.Alignment.left },
                 { text: "Align_Left", property: "alignment", expected: "left"},
+                { text: "Align_Left", property: "left", expected: true},
                 { text: "Align_Left", property: "left", expected: true},
 
                 // { text: "Align_Right", property: "right", expected: Word.Alignment.right },
@@ -76,7 +81,16 @@ async function checkFormatting() {
 
             for (let check of formatChecks) {
                 let search = context.document.body.search(check.text, { matchWholeWord: true });
-                search.load("items/paragraphFormat/alignment, items/font, items/font/bold, items/font/italic, items/font/underline, items/font/strikeThrough, items/font/subscript, items/font/superscript, items/font/color, items/font/highlightColor, items/font/name, items/font/size, items/text");
+                search.load(
+                    "items/paragraphFormat/alignment, " + 
+                    "items/font, items/font/bold, items/font/italic, " +
+                    "items/font/underline, items/font/strikeThrough, " +
+                    "items/font/subscript, items/font/superscript, " +
+                    "items/font/color, items/font/highlightColor, " +
+                    "items/font/name, items/font/size, items/text"
+                );
+
+               // search.load("items/paragraphFormat/alignment, items/font, items/font/bold, items/font/italic, items/font/underline, items/font/strikeThrough, items/font/subscript, items/font/superscript, items/font/color, items/font/highlightColor, items/font/name, items/font/size, items/text");
                 
                 await context.sync();
                
