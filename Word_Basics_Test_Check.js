@@ -20,9 +20,8 @@ async function checkFormatting() {
                 { text: "Align_Left", property: "alignment", expected: "Left", type: "paragraph" },
                 { text: "Align_Right", property: "alignment", expected: "Right", type: "paragraph" },
                 { text: "Align_Justified", property: "alignment", expected: "Justified", type: "paragraph" },
-
-                { text: "Bold1", property: "bold", expected: true, type: "font" },  // NEW: Added type property
-                { text: "Italic1", property: "italic", expected: true, type: "font" }  // NEW: Added type property
+                { text: "Bold1", property: "bold", expected: true, type: "font" },
+                { text: "Italic1", property: "italic", expected: true, type: "font" }
             ];
 
             let results = [];
@@ -31,13 +30,12 @@ async function checkFormatting() {
 
             for (let check of formatChecks) {
                 let search = context.document.body.search(check.text, { matchWholeWord: true });
-                     // Modified loading of properties
-                     if (check.type === "font") {
-                        search.load("items/font, items/font/bold, items/font/italic, items/font/underline, items/font/strikeThrough, items/font/subscript, items/font/superscript, items/font/color, items/font/highlightColor, items/font/name, items/font/size, items/text");
-                    } else if (check.type === "paragraph") {
-                        // NEW: Load parent paragraph and its alignment
-                        search.load("items/parentParagraph, items/parentParagraph/alignment, items/text");
-                    }            
+
+                if (check.type === "font") {
+                    search.load("items/font, items/font/bold, items/font/italic, items/font/underline, items/font/strikeThrough, items/font/subscript, items/font/superscript, items/font/color, items/font/highlightColor, items/font/name, items/font/size, items/text");
+                } else if (check.type === "paragraph") {
+                    search.load("items/parentParagraph, items/parentParagraph/alignment, items/text");
+                }
                 await context.sync();
 
                 let isCorrect = false;
@@ -47,13 +45,11 @@ async function checkFormatting() {
                     for (let i = 0; i < search.items.length; i++) {
                         let propertyValue;
 
-                        // Determine how to check the property based on type
                         if (check.type === "font") {
                             propertyValue = search.items[i].font[check.property];
                             console.log("Word:", search.items[i].text);
                             console.log(`Font ${check.property}:`, propertyValue);
 
-                            // Use existing font property checking logic
                             if (check.property === "highlightColor" || check.property === "color") {
                                 if (Array.isArray(check.expected) && check.expected.includes(propertyValue)) {
                                     isCorrect = true;
@@ -78,7 +74,6 @@ async function checkFormatting() {
                                 console.log("Word:", search.items[i].text);
                                 console.log(`Paragraph Alignment:`, propertyValue);
 
-                                // Simple alignment checking
                                 if (propertyValue === check.expected) {
                                     isCorrect = true;
                                     break;
@@ -96,14 +91,10 @@ async function checkFormatting() {
                     </p>`
                 );
             }
-            // let scorePercentage = ((correctCount / totalCount) * 100).toFixed(2);
-            // let scoreDisplay = `<h3>Score: <span class="math-inline">\{correctCount\}/</span>{totalCount} (${scorePercentage}%)</h3>`;
-            // await context.sync();
-           
 
             let scorePercentage = ((correctCount / totalCount) * 100).toFixed(2);
-            let scoreDisplay = `<h3>Score: ${correctCount}/${totalCount} (${scorePercentage}%)</h3>`; // Corrected line
-              await context.sync();
+            let scoreDisplay = `<h3>Score: ${correctCount}/${totalCount} (${scorePercentage}%)</h3>`;
+            await context.sync();
 
             document.getElementById("result").innerHTML = scoreDisplay + results.join("");
         });
@@ -123,20 +114,16 @@ function isGreenColor(color) {
     return false;
 }
 
-// Function to check if a color is a shade of pink
 function isPinkColor(color) {
     if (color.startsWith("#") && color.length === 7) {
         let r = parseInt(color.substring(1, 3), 16);
         let g = parseInt(color.substring(3, 5), 16);
         let b = parseInt(color.substring(5, 7), 16);
-        
-        // A shade of pink generally has high red, medium blue, and low green
         return r > 200 && b > 150 && g < 150;
     }
     return false;
 }
 
-// Function to check if a color is a shade of purple
 function isPurpleColor(color) {
     if (color.startsWith("#") && color.length === 7) {
         let r = parseInt(color.substring(1, 3), 16);
@@ -146,15 +133,10 @@ function isPurpleColor(color) {
     }
     return false;
 }
-//-----------------------------------------
-// ... (Part 1 from the previous response) ...
-
-
 
 async function submit_score_function() {
     document.getElementById("show_submit_div").innerText = "Submitting score to database...";
 
-    // Prevent multiple Supabase initializations
     let supabase;
     if (!window.supabaseClient) {
         const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm');
@@ -171,14 +153,12 @@ async function submit_score_function() {
     }
 
     try {
-        // Get the score from the results
         const scoreElement = document.querySelector("#result h3");
         if (!scoreElement) {
             document.getElementById("show_submit_div").innerText = "Error: Score not found. Please check formatting first.";
             return;
         }
 
-        // Extract the score from the scoreElement text (format: "Score: X/Y (Z%)")
         const scoreText = scoreElement.textContent;
         const scoreMatch = scoreText.match(/Score: (\d+)\/(\d+) \(([0-9.]+)%\)/);
 
@@ -191,7 +171,6 @@ async function submit_score_function() {
         const total = parseInt(scoreMatch[2]);
         const percentage = parseFloat(scoreMatch[3]);
 
-        // Find student using supabase_user_id
         const { data: studentData, error: studentError } = await supabase
             .from('students')
             .select('student_id')
@@ -206,14 +185,6 @@ async function submit_score_function() {
 
         const studentId = studentData.student_id;
 
-        //-----------------------------------------------------------------------------------------
-        //-----------------------------------------------------------------------------------------
-        //-----------------------------------------------------------------------------------------
-        // .eq('assignment_name', 'formatting_assignment')  <-- change the assignment name here --> 'formatting_assignment'
-        //-----------------------------------------------------------------------------------------
-        //-----------------------------------------------------------------------------------------
-        //-----------------------------------------------------------------------------------------
-        // Find the existing assignment
         const { data: assignmentData, error: assignmentError } = await supabase
             .from('assignments')
             .select('id, score')
@@ -230,11 +201,10 @@ async function submit_score_function() {
         const assignmentId = assignmentData.id;
         const existingScore = assignmentData.score || 0;
 
-        // Only update if new score is Higher
         if (percentage >= existingScore) {
             const { error: updateError } = await supabase
                 .from('assignments')
-                .update({ 
+                .update({
                     score: percentage,
                     date_completed: new Date().toISOString()
                 })
