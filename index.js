@@ -27,6 +27,8 @@ Office.onReady(function (info) {
         }
     }
 
+
+
     function logout() {
         Office.context.document.settings.remove("userSession");
         Office.context.document.settings.saveAsync(() => {
@@ -34,3 +36,5 @@ Office.onReady(function (info) {
         });
     }
 });
+
+
