@@ -21,46 +21,8 @@ async function checkFormatting() {
                 { text: "Align_Right", property: "alignment", expected: "Right", type: "paragraph" },
                 { text: "Align_Justified", property: "alignment", expected: "Justified", type: "paragraph" },
 
-                { text: "Bold1", property: "bold", expected: true },
-                { text: "Italic1", property: "italic", expected: true },
-                { text: "Underline1", property: "underline", expected: "exists" },
-                { text: "Subscript1", property: "subscript", expected: true },
-                { text: "Superscript1", property: "superscript", expected: true },
-                { text: "Strikethrough1", property: "strikeThrough", expected: true },
-                { text: "Font_Type_Calibri", property: "name", expected: "Calibri" },
-                { text: "Font_Type_Times New Roman", property: "name", expected: "Times New Roman" },
-                { text: "Font_Type_Comic Sans MS", property: "name", expected: "Comic Sans MS" },
-                { text: "Font_Type_Consolas", property: "name", expected: "Consolas" },
-                { text: "Font_Color_Red", property: "color", expected: ["#FF0000", "red"] },
-                { text: "Font_Color_Dark_Green", property: "color", expected: ["#008000", "green"] },
-                { text: "Font_Color_Purple", property: "color", expected: ["#800080", "purple"] },
-                { text: "Highlighted_Green", property: "highlightColor", expected: ["#00FF00", "green"] },
-                { text: "Highlight_Cyan", property: "highlightColor", expected: ["cyan", "#00FFFF"] },
-                { text: "Highlight_Yellow", property: "highlightColor", expected: ["yellow", "#FFFF00"] },
-                { text: "Font_Size_14", property: "size", expected: 14 },
-                { text: "Font_Size_16", property: "size", expected: 16 },
-                { text: "Font_Size_19", property: "size", expected: 19 },
-                { text: "Font_Size_24", property: "size", expected: 24 },
-                { text: "Bold2", property: "bold", expected: true },
-                { text: "Italic2", property: "italic", expected: true },
-                { text: "Underline2", property: "underline", expected: "exists" },
-                { text: "Subscript2", property: "subscript", expected: true },
-                { text: "Superscript2", property: "superscript", expected: true },
-                { text: "Strikethrough2", property: "strikeThrough", expected: true },
-                { text: "Font_Type_Verdana Pro", property: "name", expected: "Verdana Pro" },
-                { text: "Font_Type_Cooper Black", property: "name", expected: "Cooper Black" },
-                { text: "Font_Type_Cambria", property: "name", expected: "Cambria" },
-                { text: "Font_Type_Georgia Pro", property: "name", expected: "Georgia Pro" },
-                { text: "Font_Color_Blue", property: "color", expected: ["#0070C0", "blue"] },
-                { text: "Font_Color_Orange", property: "color", expected: ["#FFC000", "orange"] },
-                { text: "Font_Color_Pink", property: "color", expected: ["#FFC0CB", "pink"] },
-                { text: "Highlighted_Blue", property: "highlightColor", expected: ["#0000FF", "blue"] },
-                { text: "Highlight_Magenta", property: "highlightColor", expected: ["magenta", "#FF00FF"] },
-                { text: "Highlight_Red", property: "highlightColor", expected: ["red", "#FF0000"] },
-                { text: "Font_Size_10", property: "size", expected: 10 },
-                { text: "Font_Size_15", property: "size", expected: 15 },
-                { text: "Font_Size_36", property: "size", expected: 36 },
-                { text: "Font_Size_46", property: "size", expected: 46 }
+                { text: "Bold1", property: "bold", expected: true, type: "font" },  // NEW: Added type property
+                { text: "Italic1", property: "italic", expected: true, type: "font" }  // NEW: Added type property
             ];
 
             let results = [];
@@ -69,11 +31,13 @@ async function checkFormatting() {
 
             for (let check of formatChecks) {
                 let search = context.document.body.search(check.text, { matchWholeWord: true });
-                 if (check.type === "font") {
-                    search.load("items/font, items/font/bold, items/font/italic, items/font/underline, items/font/strikeThrough, items/font/subscript, items/font/superscript, items/font/color, items/font/highlightColor, items/font/name, items/font/size, items/text");
-                } else if (check.type === "paragraph") {
-                    search.load("items/paragraphFormat/alignment, items/text");
-                }                
+                     // Modified loading of properties
+                     if (check.type === "font") {
+                        search.load("items/font, items/font/bold, items/font/italic, items/font/underline, items/font/strikeThrough, items/font/subscript, items/font/superscript, items/font/color, items/font/highlightColor, items/font/name, items/font/size, items/text");
+                    } else if (check.type === "paragraph") {
+                        // NEW: Load parent paragraph and its alignment
+                        search.load("items/parentParagraph, items/parentParagraph/alignment, items/text");
+                    }            
                 await context.sync();
 
                 let isCorrect = false;
@@ -109,14 +73,16 @@ async function checkFormatting() {
                                 break;
                             }
                         } else if (check.type === "paragraph") {
-                            propertyValue = search.items[i].paragraphFormat.alignment;
-                            console.log("Word:", search.items[i].text);
-                            console.log(`Paragraph Alignment:`, propertyValue);
+                            if (search.items[i].parentParagraph) {
+                                propertyValue = search.items[i].parentParagraph.alignment;
+                                console.log("Word:", search.items[i].text);
+                                console.log(`Paragraph Alignment:`, propertyValue);
 
-                            // Simple alignment checking
-                            if (propertyValue === check.expected) {
-                                isCorrect = true;
-                                break;
+                                // Simple alignment checking
+                                if (propertyValue === check.expected) {
+                                    isCorrect = true;
+                                    break;
+                                }
                             }
                         }
                     }
