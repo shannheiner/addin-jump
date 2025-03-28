@@ -1,5 +1,8 @@
 Office.onReady(function (info) {
     document.getElementById("checkFormat").addEventListener("click", checkMultipleFormats);
+    console.log("Office.js version loaded");
+    console.log("Word API supported:", 
+        Office.context.requirements.isSetSupported('WordApi', '1.3'));
 });
 
 async function checkMultipleFormats() {
