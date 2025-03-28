@@ -1,5 +1,5 @@
 Office.onReady(function (info) {
-    document.getElementById("checkAlignment").addEventListener("click", checkLeftAlignment);
+    document.getElementById("checkFormat").addEventListener("click", checkLeftAlignment);
 });
 
 async function checkLeftAlignment() {
