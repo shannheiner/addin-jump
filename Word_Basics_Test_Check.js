@@ -16,6 +16,11 @@ async function checkFormatting() {
 
         await Word.run(async (context) => {
             let formatChecks = [
+                { text: "Align_Center", property: "alignment", expected: "Centered", type: "paragraph" },
+                { text: "Align_Left", property: "alignment", expected: "Left", type: "paragraph" },
+                { text: "Align_Right", property: "alignment", expected: "Right", type: "paragraph" },
+                { text: "Align_Justified", property: "alignment", expected: "Justified", type: "paragraph" },
+
                 { text: "Bold1", property: "bold", expected: true },
                 { text: "Italic1", property: "italic", expected: true },
                 { text: "Underline1", property: "underline", expected: "exists" },
@@ -64,7 +69,11 @@ async function checkFormatting() {
 
             for (let check of formatChecks) {
                 let search = context.document.body.search(check.text, { matchWholeWord: true });
-                search.load("items/font, items/font/bold, items/font/italic, items/font/underline, items/font/strikeThrough, items/font/subscript, items/font/superscript, items/font/color, items/font/highlightColor, items/font/name, items/font/size, items/text");
+                 if (check.type === "font") {
+                    search.load("items/font, items/font/bold, items/font/italic, items/font/underline, items/font/strikeThrough, items/font/subscript, items/font/superscript, items/font/color, items/font/highlightColor, items/font/name, items/font/size, items/text");
+                } else if (check.type === "paragraph") {
+                    search.load("items/paragraphFormat/alignment, items/text");
+                }                
                 await context.sync();
 
                 let isCorrect = false;
@@ -72,27 +81,43 @@ async function checkFormatting() {
 
                 if (isFound) {
                     for (let i = 0; i < search.items.length; i++) {
-                        let fontProperty = search.items[i].font[check.property];
-                        console.log("Word:", search.items[i].text);
-                        console.log(`${check.property}:`, fontProperty);
+                        let propertyValue;
 
-                        if (check.property === "highlightColor" || check.property === "color") {
-                            if (Array.isArray(check.expected) && check.expected.includes(fontProperty)) {
+                        // Determine how to check the property based on type
+                        if (check.type === "font") {
+                            propertyValue = search.items[i].font[check.property];
+                            console.log("Word:", search.items[i].text);
+                            console.log(`Font ${check.property}:`, propertyValue);
+
+                            // Use existing font property checking logic
+                            if (check.property === "highlightColor" || check.property === "color") {
+                                if (Array.isArray(check.expected) && check.expected.includes(propertyValue)) {
+                                    isCorrect = true;
+                                    break;
+                                }
+                                if ((check.text.includes("Green") && isGreenColor(propertyValue)) ||
+                                    (check.text.includes("Purple") && isPurpleColor(propertyValue)) ||
+                                    (check.text.includes("Pink") && isPinkColor(propertyValue))) {
+                                    isCorrect = true;
+                                    break;
+                                }
+                            } else if (check.property === "underline" && propertyValue !== "None") {
+                                isCorrect = true;
+                                break;
+                            } else if (propertyValue === check.expected) {
                                 isCorrect = true;
                                 break;
                             }
-                            if ((check.text.includes("Green") && isGreenColor(fontProperty)) ||
-                                (check.text.includes("Purple") && isPurpleColor(fontProperty)) ||
-                                (check.text.includes("Pink") && isPinkColor(fontProperty))) {
+                        } else if (check.type === "paragraph") {
+                            propertyValue = search.items[i].paragraphFormat.alignment;
+                            console.log("Word:", search.items[i].text);
+                            console.log(`Paragraph Alignment:`, propertyValue);
+
+                            // Simple alignment checking
+                            if (propertyValue === check.expected) {
                                 isCorrect = true;
                                 break;
                             }
-                        } else if (check.property === "underline" && fontProperty !== "None") {
-                            isCorrect = true;
-                            break;
-                        } else if (fontProperty === check.expected) {
-                            isCorrect = true;
-                            break;
                         }
                     }
                 }
@@ -105,7 +130,6 @@ async function checkFormatting() {
                     </p>`
                 );
             }
-
             // let scorePercentage = ((correctCount / totalCount) * 100).toFixed(2);
             // let scoreDisplay = `<h3>Score: <span class="math-inline">\{correctCount\}/</span>{totalCount} (${scorePercentage}%)</h3>`;
             // await context.sync();
