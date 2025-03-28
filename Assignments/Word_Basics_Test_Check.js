@@ -110,9 +110,14 @@ async function checkFormatting() {
                         console.log(`${check.property}:`, fontProperty);
                         // console.log("Paragraph Range:", search.items[i].parentParagraph.getRange().text);
 
-                    if (check.property === "alignment" && item.paragraphFormat.alignment === check.expected) {
-                        isCorrect = true;
-                    }
+                    //added just below
+                    let paragraph = search.items[i].paragraphFormat;
+                       // Check alignment
+                      if (check.property === "alignment" && paragraph.alignment === check.expected) {
+                             isCorrect = true;
+                             break;
+                         }
+                         //end added
 
                         if (check.property === "highlightColor" || check.property === "color") {
                             if (Array.isArray(check.expected) && check.expected.includes(fontProperty)) {
