@@ -113,7 +113,7 @@ async function checkFormatting() {
                     //added just below
                     let paragraph = search.items[i].paragraphFormat;
                        // Check alignment
-                      if (check.property === "alignment" && paragraph.alignment === check.expected) {
+                      if (check.property === "alignment" && paragraph === check.expected) {
                              isCorrect = true;
                              break;
                          }
