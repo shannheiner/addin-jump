@@ -111,20 +111,35 @@ async function checkFormatting() {
                         // console.log("Paragraph Range:", search.items[i].parentParagraph.getRange().text);
 
                     //added just below
-              // Check alignment
-                            if (check.property === "alignment") {
-                                let alignmentMap = {
-                                    "center": Word.Alignment.center,
-                                    "right": Word.Alignment.right,
-                                    "left": Word.Alignment.left
-                                };
+                    if (check.property === "alignment") {
+                        let alignmentMap = {
+                            "center": Word.Alignment.center,
+                            "right": Word.Alignment.right,
+                            "left": Word.Alignment.left
+                        };
+                        
+                        if (search.items[i].paragraphFormat.alignment === alignmentMap[check.expected.toLowerCase()]) {
+                            isCorrect = true;
+                            break;
+                        }
+                    }
+
+
+
+            //   // Check alignment
+            //                 if (check.property === "alignment") {
+            //                     let alignmentMap = {
+            //                         "center": Word.Alignment.center,
+            //                         "right": Word.Alignment.right,
+            //                         "left": Word.Alignment.left
+            //                     };
                                 
-                                if (paragraph.alignment === alignmentMap[check.expected.toLowerCase()]) {
-                                    isCorrect = true;
-                                    break;
-                                }
-                            }
-                         //end added
+            //                     if (paragraph.alignment === alignmentMap[check.expected.toLowerCase()]) {
+            //                         isCorrect = true;
+            //                         break;
+            //                     }
+            //                 }
+            //              //end added
 
                         if (check.property === "highlightColor" || check.property === "color") {
                             if (Array.isArray(check.expected) && check.expected.includes(fontProperty)) {
