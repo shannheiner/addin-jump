@@ -2,6 +2,9 @@ Office.onReady(function (info) {
     document.getElementById("checkFormat").addEventListener("click", checkFormatting);
 });
 
+
+
+
 async function checkFormatting() {
     document.getElementById("myButton").classList.remove("hidden");
 
@@ -41,12 +44,14 @@ async function checkFormatting() {
                 //Does not work 
               //  { text: "Align_Center", property: "center", expected: Word.Alignment.center },
 
-                { text: "Align_Center", property: "center", expected: Word.Alignment.center },
+                { text: "Align_Center", property: "center", expected: "center"},
                 
                 { text: "Align_Left", property: "left", expected: Word.Alignment.left },
                 { text: "Align_Left", property: "alignment", expected: "left"},
                 { text: "Align_Left", property: "left", expected: true},
                 { text: "Align_Left", property: "left", expected: true},
+
+                
 
                 // { text: "Align_Right", property: "right", expected: Word.Alignment.right },
                 { text: "Align_Right", property: "alignment", expected: "right" },
@@ -104,6 +109,10 @@ async function checkFormatting() {
                         console.log("Word:", search.items[i].text);
                         console.log(`${check.property}:`, fontProperty);
                         // console.log("Paragraph Range:", search.items[i].parentParagraph.getRange().text);
+
+                    if (check.property === "alignment" && item.paragraphFormat.alignment === check.expected) {
+                        isCorrect = true;
+                    }
 
                         if (check.property === "highlightColor" || check.property === "color") {
                             if (Array.isArray(check.expected) && check.expected.includes(fontProperty)) {
