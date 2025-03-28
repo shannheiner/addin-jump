@@ -1,3 +1,9 @@
+Office.onReady(function (info) {
+    document.getElementById("checkFormat").addEventListener("click", checkFormatting);
+});
+
+
+
 async function checkFormatting() {
     document.getElementById("myButton").classList.remove("hidden");
 
