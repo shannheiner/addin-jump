@@ -3,7 +3,7 @@ Office.onReady(function (info) {
 });
 
 
-
+const Word = require('office-js').Word;
 
 async function checkFormatting() {
     document.getElementById("myButton").classList.remove("hidden");
@@ -111,12 +111,19 @@ async function checkFormatting() {
                         // console.log("Paragraph Range:", search.items[i].parentParagraph.getRange().text);
 
                     //added just below
-                    let paragraph = search.items[i].paragraphFormat;
-                       // Check alignment
-                      if (check.property === "alignment" && paragraph === check.expected) {
-                             isCorrect = true;
-                             break;
-                         }
+              // Check alignment
+                            if (check.property === "alignment") {
+                                let alignmentMap = {
+                                    "center": Word.Alignment.center,
+                                    "right": Word.Alignment.right,
+                                    "left": Word.Alignment.left
+                                };
+                                
+                                if (paragraph.alignment === alignmentMap[check.expected.toLowerCase()]) {
+                                    isCorrect = true;
+                                    break;
+                                }
+                            }
                          //end added
 
                         if (check.property === "highlightColor" || check.property === "color") {
