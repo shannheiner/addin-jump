@@ -16,11 +16,13 @@
             document.getElementById("result").innerHTML = ""; // Clear previous results
             await Word.run(async (context) => {
                 let formatChecks = [
-                    { text: "Align_Left", type: "paragraph", property: "alignment", expected: "Left" },
+                    { text: "Align_Left", type: "paragraph", property: "alignment", expected: Word.Alignment.left },
                     { text: "Bold1", type: "font", property: "bold", expected: true },
-                    { text: "Align_Right", type: "paragraph", property: "alignment", expected: "Right" },
+                    { text: "Align_Right", type: "paragraph", property: "alignment", expected: Word.Alignment.right },
                     { text: "Italic1", type: "font", property: "italic", expected: true }
                 ];
+               
+               
                 let results = [];
                 for (let check of formatChecks) {
                     let search = context.document.body.search(check.text, { matchWholeWord: true });
