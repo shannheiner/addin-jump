@@ -15,7 +15,6 @@
         try {
             document.getElementById("result").innerHTML = ""; // Clear previous results
             await Word.run(async (context) => {
-                // Define checks with more flexible expected values
                 let formatChecks = [
                     { text: "Align_Left", type: "paragraph", property: "alignment", expected: ["left", "Left", 0] },
                     { text: "Bold1", type: "font", property: "bold", expected: true },
@@ -28,7 +27,9 @@
                 for (let check of formatChecks) {
                     // Search for the text
                     let search = context.document.body.search(check.text, { matchWholeWord: true });
-                    context.load(search, 'items');
+                    
+                    // Load the search results first
+                    context.load(search, "items");
                     await context.sync();
                     
                     let isFound = search.items.length > 0;
@@ -40,7 +41,8 @@
                             let item = search.items[i];
                             
                             if (check.type === "font") {
-                                // Load font properties
+                                // Load the item and its font property
+                                context.load(item, "text,font");
                                 context.load(item.font, check.property);
                                 await context.sync();
                                 
@@ -52,21 +54,29 @@
                                     break;
                                 }
                             } else if (check.type === "paragraph") {
-                                // Load paragraph properties
-                                let paragraph = item.parentParagraph;
-                                context.load(paragraph, 'alignment');
+                                // First load the parent paragraph reference
+                                context.load(item, "text,parentParagraph");
                                 await context.sync();
                                 
-                                let actualValue = paragraph.alignment;
-                                debugInfo = `Paragraph alignment: ${actualValue}`;
-                                
-                                // Check against all possible expected values (array of alternatives)
-                                if (Array.isArray(check.expected) && check.expected.includes(actualValue)) {
-                                    isCorrect = true;
-                                    break;
-                                } else if (actualValue === check.expected) {
-                                    isCorrect = true;
-                                    break;
+                                // Check if parentParagraph exists before accessing it
+                                if (item.parentParagraph) {
+                                    // Then load its alignment property
+                                    context.load(item.parentParagraph, check.property);
+                                    await context.sync();
+                                    
+                                    let actualValue = item.parentParagraph[check.property];
+                                    debugInfo = `Paragraph ${check.property}: ${actualValue}`;
+                                    
+                                    // Check against all possible expected values
+                                    if (Array.isArray(check.expected) && check.expected.includes(actualValue)) {
+                                        isCorrect = true;
+                                        break;
+                                    } else if (actualValue === check.expected) {
+                                        isCorrect = true;
+                                        break;
+                                    }
+                                } else {
+                                    debugInfo = "ParentParagraph is undefined";
                                 }
                             }
                         }
