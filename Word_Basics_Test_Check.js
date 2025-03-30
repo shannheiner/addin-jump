@@ -15,20 +15,64 @@
         try {
             document.getElementById("result").innerHTML = ""; // Clear previous results
             await Word.run(async (context) => {
+                // Get all paragraphs in the document
+                const paragraphs = context.document.body.paragraphs;
+                context.load(paragraphs, "text,lineSpacing");
+                await context.sync();
+                
                 let formatChecks = [
-                    { text: "Align_Left", type: "paragraph", property: "alignment", expected: ["left", "Left", 0] },
+                    { text: "LineSpacing1", type: "paragraph", property: "lineSpacing", expected: 1 },
                     { text: "Bold1", type: "font", property: "bold", expected: true },
-                    { text: "Align_Right", type: "paragraph", property: "alignment", expected: ["right", "Right", 1] },
                     { text: "Italic1", type: "font", property: "italic", expected: true }
                 ];
                 
                 let results = [];
                 
-                for (let check of formatChecks) {
-                    // Search for the text
-                    let search = context.document.body.search(check.text, { matchWholeWord: true });
+                // Process paragraph checks first
+                const paragraphChecks = formatChecks.filter(check => check.type === "paragraph");
+                for (let check of paragraphChecks) {
+                    let isFound = false;
+                    let isCorrect = false;
+                    let debugInfo = "";
                     
-                    // Load the search results first
+                    // Look through all paragraphs for ones containing our check text
+                    for (let i = 0; i < paragraphs.items.length; i++) {
+                        const para = paragraphs.items[i];
+                        
+                        if (para.text.includes(check.text)) {
+                            isFound = true;
+                            const actualValue = para.lineSpacing;
+                            debugInfo = `Paragraph ${check.property}: ${actualValue}`;
+                            
+                            // Check if the actual value matches the expected value
+                            // For line spacing, we'll do an approximate match since it might be stored as a float
+                            if (check.property === "lineSpacing") {
+                                // Check if the values are approximately equal (within 0.05)
+                                if (Math.abs(actualValue - check.expected) < 0.05) {
+                                    isCorrect = true;
+                                    break;
+                                }
+                            } else if (Array.isArray(check.expected) && check.expected.includes(actualValue)) {
+                                isCorrect = true;
+                                break;
+                            } else if (actualValue === check.expected) {
+                                isCorrect = true;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    results.push(
+                        `<p style="background-color: ${isFound ? (isCorrect ? 'lightgreen' : 'lightcoral') : 'lightyellow'};">
+                            ${check.text}: ${isFound ? (isCorrect ? "Correct" : "Incorrect - " + debugInfo) : "Not Found"}
+                        </p>`
+                    );
+                }
+                
+                // Now process font checks
+                const fontChecks = formatChecks.filter(check => check.type === "font");
+                for (let check of fontChecks) {
+                    let search = context.document.body.search(check.text, { matchWholeWord: true });
                     context.load(search, "items");
                     await context.sync();
                     
@@ -38,46 +82,17 @@
                     
                     if (isFound) {
                         for (let i = 0; i < search.items.length; i++) {
-                            let item = search.items[i];
+                            let range = search.items[i];
+                            context.load(range, "text,font");
+                            context.load(range.font, check.property);
+                            await context.sync();
                             
-                            if (check.type === "font") {
-                                // Load the item and its font property
-                                context.load(item, "text,font");
-                                context.load(item.font, check.property);
-                                await context.sync();
-                                
-                                let actualValue = item.font[check.property];
-                                debugInfo = `Font ${check.property}: ${actualValue}`;
-                                
-                                if (actualValue === check.expected) {
-                                    isCorrect = true;
-                                    break;
-                                }
-                            } else if (check.type === "paragraph") {
-                                // First load the parent paragraph reference
-                                context.load(item, "text,parentParagraph");
-                                await context.sync();
-                                
-                                // Check if parentParagraph exists before accessing it
-                                if (item.parentParagraph) {
-                                    // Then load its alignment property
-                                    context.load(item.parentParagraph, check.property);
-                                    await context.sync();
-                                    
-                                    let actualValue = item.parentParagraph[check.property];
-                                    debugInfo = `Paragraph ${check.property}: ${actualValue}`;
-                                    
-                                    // Check against all possible expected values
-                                    if (Array.isArray(check.expected) && check.expected.includes(actualValue)) {
-                                        isCorrect = true;
-                                        break;
-                                    } else if (actualValue === check.expected) {
-                                        isCorrect = true;
-                                        break;
-                                    }
-                                } else {
-                                    debugInfo = "ParentParagraph is undefined";
-                                }
+                            let actualValue = range.font[check.property];
+                            debugInfo = `Font ${check.property}: ${actualValue}`;
+                            
+                            if (actualValue === check.expected) {
+                                isCorrect = true;
+                                break;
                             }
                         }
                     }
