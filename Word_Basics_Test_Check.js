@@ -24,7 +24,7 @@
                   //  { text: "LineSpacing1", type: "paragraph", property: "lineSpacing", expected: 18 },
                     { text: "LineSpacing1", type: "paragraph", property: "lineSpacing", expected: 18 },
                     { text: "LineSpacing2", type: "paragraph", property: "lineSpacing", expected: 18 },
-                    { text: "Align_Left", type: "paragraph", property: "alignment", expected: "Left" },
+                    { text: "Align_Left", type: "paragraph", property: "Alignment", expected: "Left" },
 
                     { text: "Align_Center", type: "paragraph", property: "Word.Alignment", expected: 18},
 
