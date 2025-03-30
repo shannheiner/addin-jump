@@ -21,9 +21,18 @@
                 await context.sync();
                 
                 let formatChecks = [
-                    { text: "LineSpacing1", type: "paragraph", property: "lineSpacing", expected: 1 },
+                  //  { text: "LineSpacing1", type: "paragraph", property: "lineSpacing", expected: 18 },
+                    { text: "LineSpacing1", type: "paragraph", property: "lineSpacing", expected: 18 },
+                    { text: "LineSpacing2", type: "paragraph", property: "lineSpacing", expected: 18 },
+                    { text: "Align_Left", type: "paragraph", property: "alignment", expected: "Left" },
+
+                    { text: "LineSpacing4", type: "paragraph", property: "Word.Alignment", expected: Centered},
+
+                    { text: "LineSpacing3", type: "paragraph", property: "alignCenter", expected: 18 },
+                    { text: "LineSpacing4", type: "paragraph", property: "lineSpacing", expected: 18 },
+
                     { text: "Bold1", type: "font", property: "bold", expected: true },
-                    { text: "Italic1", type: "font", property: "italic", expected: true }
+                    { text: "Italic1", type: "font", property: "italic", expected: true },
                 ];
                 
                 let results = [];
