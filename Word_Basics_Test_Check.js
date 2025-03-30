@@ -11,10 +11,21 @@
         }
     });
     
+
     async function checkMultipleFormats() {
         try {
             document.getElementById("result").innerHTML = ""; // Clear previous results
             await Word.run(async (context) => {
+
+                let paragraph = context.document.body.paragraphs.getFirst();
+                paragraph.load("alignment");
+                await context.sync();
+            
+                console.log("Alignment:", paragraph.alignment); 
+                console.log("Type of alignment:", typeof paragraph.alignment);
+
+
+
                 // Get all paragraphs in the document
                 const paragraphs = context.document.body.paragraphs;
                 context.load(paragraphs, "text,lineSpacing");
