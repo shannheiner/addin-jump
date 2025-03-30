@@ -26,11 +26,11 @@
                     { text: "LineSpacing2", type: "paragraph", property: "lineSpacing", expected: 18 },
                     { text: "Align_Left", type: "paragraph", property: "alignment", expected: "Left" },
 
-                    { text: "LineSpacing5", type: "paragraph", property: "Word.Alignment", expected: 18},
+                    { text: "Align_Center", type: "paragraph", property: "Word.Alignment", expected: 18},
 
-                    { text: "LineSpacing7", type: "paragraph", property: "Word.Alignment", expected: "Centered"},
+                    { text: "Align_Center1", type: "paragraph", property: "Word.Alignment", expected: "Centered"},
 
-                    { text: "LineSpacing3", type: "paragraph", property: "alignCenter", expected: 18 },
+                    { text: "alignCenter", type: "paragraph", property: "alignCenter", expected: 18 },
                     { text: "LineSpacing4", type: "paragraph", property: "lineSpacing", expected: 18 },
 
                     { text: "Bold1", type: "font", property: "bold", expected: true },
