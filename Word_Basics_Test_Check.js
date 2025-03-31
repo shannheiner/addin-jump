@@ -11,7 +11,6 @@
         }
     });
     
-
     async function checkMultipleFormats() {
         try {
             document.getElementById("result").innerHTML = ""; // Clear previous results
@@ -19,15 +18,18 @@
                 // Get all paragraphs in the document
                 const paragraphs = context.document.body.paragraphs;
                 
-                // Load all the properties we want to check
-                context.load(paragraphs, "text,lineSpacing,firstLineIndent,leftIndent,rightIndent,alignment");
-                context.load(paragraphs, "borderTop,borderBottom");
+                // Load the paragraphs collection first
+                context.load(paragraphs);
+                await context.sync();
                 
-                // For list format, we need to load additional properties
+                // Now we can access paragraphs.items because we've loaded the collection
+                // Load all the properties we want to check for each paragraph
                 paragraphs.items.forEach(para => {
+                    context.load(para, "text,lineSpacing,firstLineIndent,leftIndent,rightIndent,alignment,borderTop,borderBottom");
                     context.load(para.listFormat, "isListItem,listType,listLevelNumber");
                 });
                 
+                // Sync to load all the paragraph properties
                 await context.sync();
                 
                 let formatChecks = [
@@ -63,7 +65,7 @@
                 
                 let results = [];
                 
-                // Process paragraph checks first
+                // Process paragraph checks
                 const paragraphChecks = formatChecks.filter(check => check.type === "paragraph");
                 for (let check of paragraphChecks) {
                     let isFound = false;
@@ -119,7 +121,7 @@
                 const fontChecks = formatChecks.filter(check => check.type === "font");
                 for (let check of fontChecks) {
                     let search = context.document.body.search(check.text, { matchWholeWord: true });
-                    context.load(search, "items");
+                    context.load(search);
                     await context.sync();
                     
                     let isFound = search.items.length > 0;
@@ -150,28 +152,26 @@
                     );
                 }
                 
-                // Add border checks - these need special handling due to how borders are structured
-                // This section could be extended based on your specific needs
-                const borderChecks = formatChecks.filter(check => 
-                    check.property === "borderTop" || check.property === "borderBottom");
+                // Border checks
+                for (let i = 0; i < paragraphs.items.length; i++) {
+                    const para = paragraphs.items[i];
+                    const borderChecks = formatChecks.filter(check => 
+                        (check.property === "borderTop" || check.property === "borderBottom") && 
+                        para.text.includes(check.text));
                     
-                for (let check of borderChecks) {
-                    let isFound = false;
-                    let isCorrect = false;
-                    let debugInfo = "";
-                    
-                    for (let i = 0; i < paragraphs.items.length; i++) {
-                        const para = paragraphs.items[i];
+                    if (borderChecks.length > 0) {
+                        // Need to explicitly load border properties for each paragraph that matches
+                        context.load(para.borderTop, "type,style,color");
+                        context.load(para.borderBottom, "type,style,color");
+                        await context.sync();
                         
-                        if (para.text.includes(check.text)) {
-                            isFound = true;
+                        for (let check of borderChecks) {
+                            let isFound = true; // We know it's found because we filtered above
+                            let isCorrect = false;
+                            let debugInfo = "";
                             
-                            // For borders, we need to check if they're visible first
+                            // Get the actual border property
                             const border = para[check.property];
-                            context.load(border, "type,style,color");
-                            await context.sync();
-                            
-                            // Check if border exists
                             const actualValue = border.type;
                             debugInfo = `${check.property}.type: ${actualValue}`;
                             
@@ -179,16 +179,15 @@
                             if (actualValue === check.expected || 
                                (check.expected === true && actualValue !== "None")) {
                                 isCorrect = true;
-                                break;
                             }
+                            
+                            results.push(
+                                `<p style="background-color: ${isCorrect ? 'lightgreen' : 'lightcoral'};">
+                                    ${check.text}: ${isCorrect ? "Correct" : "Incorrect - " + debugInfo}
+                                </p>`
+                            );
                         }
                     }
-                    
-                    results.push(
-                        `<p style="background-color: ${isFound ? (isCorrect ? 'lightgreen' : 'lightcoral') : 'lightyellow'};">
-                            ${check.text}: ${isFound ? (isCorrect ? "Correct" : "Incorrect - " + debugInfo) : "Not Found"}
-                        </p>`
-                    );
                 }
                 
                 document.getElementById("result").innerHTML = results.join("");
