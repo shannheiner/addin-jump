@@ -1,6 +1,5 @@
 (function() {
     "use strict";
-
     // The Office initialize function must be run each time a new page is loaded
     Office.onReady(function(info) {
         if (info.host === Office.HostType.Word) {
@@ -16,9 +15,9 @@
             await Word.run(async (context) => {
                 let paragraph = context.document.body.insertParagraph("Hello, Word Online!", Word.InsertLocation.start);
                 await context.sync();
-            }); // Missing closing parenthesis and brace here!
+            });
         } catch (error) {
             console.error("Error in testFunction:", error);
         }
-    } // Missing closing brace here!
+    }
 })();
